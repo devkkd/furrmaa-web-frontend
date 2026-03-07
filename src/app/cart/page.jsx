@@ -1,17 +1,70 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, useCallback } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useCartStore } from '@/store/cartStore';
 import Container from '@/components/Container';
 
+const getApiBase = () => typeof process !== 'undefined' && process.env.NEXT_PUBLIC_API_URL
+  ? process.env.NEXT_PUBLIC_API_URL
+  : 'http://localhost:5000/api';
+
+const getToken = () => {
+  if (typeof window === 'undefined') return null;
+  return localStorage.getItem('token');
+};
+
+async function fetchAddresses() {
+  const base = getApiBase();
+  const token = getToken();
+  if (!token) return [];
+  const res = await fetch(`${base}/addresses`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) return [];
+  const data = await res.json();
+  return data.addresses || [];
+}
+
+// Placeholder image to avoid 404 (no local /images/products/p1.png)
+const PLACEHOLDER_IMG = 'https://placehold.co/80x80/e5e7eb/6b7280?text=Pet';
+
 export default function CartPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const items = useCartStore((s) => s.items);
   const removeItem = useCartStore((s) => s.removeItem);
   const updateQty = useCartStore((s) => s.updateQty);
   const [paymentMethod, setPaymentMethod] = useState('upi');
+  const [address, setAddress] = useState(null);
+  const [loadingAddress, setLoadingAddress] = useState(true);
+
+  const loadAddress = useCallback(async () => {
+    setLoadingAddress(true);
+    try {
+      const addresses = await fetchAddresses();
+      const selectedId = typeof window !== 'undefined' ? localStorage.getItem('selectedAddressId') : null;
+      if (addresses.length > 0) {
+        const chosen = selectedId
+          ? addresses.find((a) => a._id === selectedId) || addresses.find((a) => a.isDefault) || addresses[0]
+          : addresses.find((a) => a.isDefault) || addresses[0];
+        setAddress(chosen);
+      } else {
+        setAddress(null);
+      }
+    } catch (_) {
+      setAddress(null);
+    } finally {
+      setLoadingAddress(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadAddress();
+  }, [loadAddress]);
+
+  const isOrderPlaced = searchParams.get('placed') === '1';
 
   const subtotal = items.reduce((sum, i) => {
     const price = i.product?.price ?? 0;
@@ -41,8 +94,17 @@ export default function CartPage() {
       <section className="min-h-[60vh] flex items-center justify-center py-16">
         <Container>
           <div className="text-center">
-            <h1 className="text-2xl font-bold text-gray-800 mb-2">Your cart is empty</h1>
-            <p className="text-gray-600 mb-6">Add items from the shop to get started.</p>
+            {isOrderPlaced ? (
+              <>
+                <h1 className="text-2xl font-bold text-green-700 mb-2">Order placed successfully</h1>
+                <p className="text-gray-600 mb-6">Thank you for your order.</p>
+              </>
+            ) : (
+              <>
+                <h1 className="text-2xl font-bold text-gray-800 mb-2">Your cart is empty</h1>
+                <p className="text-gray-600 mb-6">Add items from the shop to get started.</p>
+              </>
+            )}
             <Link
               href="/shop"
               className="inline-block bg-[#1F2E46] text-white font-semibold px-6 py-3 rounded-lg hover:opacity-90"
@@ -59,10 +121,42 @@ export default function CartPage() {
     <section className="py-12 bg-white min-h-screen">
       <Container>
         <h1 className="text-3xl font-bold text-gray-900 mb-8">Cart</h1>
-        
+
+        {/* Delivery Address - same as before (Farmaa design) */}
+        <div className="mb-6 p-4 bg-gray-50 border border-gray-100 rounded-2xl">
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div className="flex-1 min-w-0">
+              {loadingAddress ? (
+                <div className="h-10 w-48 bg-gray-200 animate-pulse rounded" />
+              ) : address ? (
+                <>
+                  <p className="font-semibold text-gray-900 mb-1">
+                    Deliver to: {address.name}, {address.phone}
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    {address.street}, {address.city}, {address.state} {address.zipCode}
+                  </p>
+                </>
+              ) : (
+                <>
+                  <p className="font-semibold text-gray-900 mb-1">No address selected</p>
+                  <p className="text-sm text-gray-600">Please add an address to continue</p>
+                </>
+              )}
+            </div>
+            <Link
+              href="/addresses"
+              className="shrink-0 bg-[#95E562] hover:bg-[#85d552] text-black font-semibold px-4 py-2.5 rounded-full transition"
+            >
+              {address ? 'Change' : 'Add'}
+            </Link>
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
           {/* Cart Items - Left Side */}
           <div className="lg:col-span-7">
+            <h2 className="text-lg font-bold text-gray-900 mb-4">Cart Items</h2>
             <div className="space-y-4 mb-6">
               {items.map((item) => (
                 <div
@@ -70,9 +164,10 @@ export default function CartPage() {
                   className="flex items-center gap-4 p-4 bg-white border border-gray-100 rounded-[24px] shadow-sm"
                 >
                   <img
-                    src={item.product?.image || '/images/products/p1.png'}
+                    src={item.product?.image || PLACEHOLDER_IMG}
                     alt={item.product?.name || 'Product'}
-                    className="w-20 h-20 object-cover rounded-xl"
+                    className="w-20 h-20 object-cover rounded-xl bg-gray-100"
+                    onError={(e) => { e.currentTarget.src = PLACEHOLDER_IMG; }}
                   />
                   <div className="flex-1">
                     <p className="font-semibold text-gray-900 mb-1">{item.product?.name || `Product ${item.productId}`}</p>

@@ -19,8 +19,20 @@ export const useCartStore = create(
             ),
           })
         } else {
+          const price = product.discountPrice ?? product.price;
+          const oldPrice = product.discountPrice != null ? product.price : (product.oldPrice ?? product.price);
           set({
-            items: [...items, { productId: product.id, qty: 1, product: { id: product.id, name: product.name, image: product.image || product.images?.[0], price: product.price } }],
+            items: [...items, {
+              productId: product.id,
+              qty: 1,
+              product: {
+                id: product.id,
+                name: product.name,
+                image: product.image || product.images?.[0],
+                price,
+                oldPrice: oldPrice > price ? oldPrice : undefined
+              }
+            }],
           })
         }
       },
@@ -35,6 +47,7 @@ export const useCartStore = create(
           ),
         })
       },
+      clearCart: () => set({ items: [] }),
     }),
     { name: 'guest-cart' }
   )

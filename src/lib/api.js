@@ -1,7 +1,7 @@
 /**
  * Web API client – backend integration
  */
-const getBaseUrl = () =>
+export const getBaseUrl = () =>
   (typeof window !== 'undefined'
     ? process.env.NEXT_PUBLIC_API_URL
     : process.env.NEXT_PUBLIC_API_URL) || 'http://localhost:5000/api';
@@ -359,14 +359,23 @@ export async function fetchMainCategories(params = {}) {
   }
 }
 
-/** Fetch all categories for filter sidebar (admin-managed) */
+/** Fetch all categories for shop/home (admin-managed; no auth required). Tries same-origin /api/categories first (proxy), then direct backend. */
 export async function fetchAllCategories() {
   const base = getBaseUrl();
+  const parse = (data) => data?.categories ?? data?.data?.categories ?? (Array.isArray(data) ? data : []);
+  const tryUrl = async (url) => {
+    const res = await fetch(url, { cache: 'no-store' });
+    if (!res.ok) throw new Error(res.statusText);
+    const data = await res.json().catch(() => ({}));
+    return parse(data);
+  };
   try {
-    const res = await fetch(`${base}/categories`);
-    if (!res.ok) return [];
-    const data = await res.json();
-    return data.categories || [];
+    // 1) Same-origin proxy (avoids CORS, works even if backend path differs)
+    const list =
+      await tryUrl('/api/categories')
+        .catch(() => tryUrl(`${base}/categories`))
+        .catch(() => tryUrl(`${base}/admin/categories`));
+    return Array.isArray(list) ? list : [];
   } catch {
     return [];
   }
@@ -595,4 +604,259 @@ export async function deleteAccount() {
     throw new Error(data.message || 'Failed to delete account. Please contact support.');
   }
   return res.json();
+}
+
+// ========== ADMIN APIs (same as app – token required) ==========
+const getAuthHeaders = () => {
+  const token = getToken();
+  if (!token) throw new Error('Admin login required');
+  return { Authorization: `Bearer ${token}` };
+};
+
+const adminFetch = async (path, options = {}) => {
+  const base = getBaseUrl();
+  const res = await fetch(`${base}${path}`, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...getAuthHeaders(),
+      ...options.headers,
+    },
+  });
+  const data = await res.json().catch(() => ({}));
+  if (res.status === 401) throw new Error('Session expired. Please login again.');
+  if (!res.ok) throw new Error(data.message || 'Request failed');
+  return data;
+};
+
+/** Upload image (same as app) – POST /upload/image with FormData, returns { url } */
+export async function adminUploadImage(file, folder = 'furmaa/products') {
+  const base = getBaseUrl();
+  const token = getToken();
+  if (!token) throw new Error('Admin login required');
+  const formData = new FormData();
+  formData.append('image', file);
+  formData.append('folder', folder);
+  const res = await fetch(`${base}/upload/image`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` },
+    body: formData,
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.message || 'Upload failed');
+  const url = data.image?.url || data.url;
+  if (!url) throw new Error('No image URL in response');
+  return { url, public_id: data.image?.public_id };
+}
+
+export async function adminGetDashboard() {
+  return adminFetch('/admin/dashboard');
+}
+
+export async function adminGetProducts() {
+  const d = await adminFetch('/admin/products');
+  return d.products || [];
+}
+
+export async function adminGetProductById(id) {
+  const d = await adminFetch(`/admin/products/${id}`);
+  return d.product;
+}
+
+export async function adminCreateProduct(body) {
+  return adminFetch('/admin/products', { method: 'POST', body: JSON.stringify(body) });
+}
+
+export async function adminUpdateProduct(id, body) {
+  return adminFetch(`/admin/products/${id}`, { method: 'PUT', body: JSON.stringify(body) });
+}
+
+export async function adminDeleteProduct(id) {
+  return adminFetch(`/admin/products/${id}`, { method: 'DELETE' });
+}
+
+export async function adminGetOrders(params = {}) {
+  const q = new URLSearchParams(params).toString();
+  const d = await adminFetch(`/admin/orders${q ? `?${q}` : ''}`);
+  return d.orders || [];
+}
+
+export async function adminGetOrderById(id) {
+  const d = await adminFetch(`/admin/orders/${id}`);
+  return d.order;
+}
+
+export async function adminUpdateOrderStatus(id, body) {
+  return adminFetch(`/admin/orders/${id}/status`, { method: 'PUT', body: JSON.stringify(body) });
+}
+
+export async function adminGetVeterinarians() {
+  const d = await adminFetch('/admin/veterinarians');
+  return d.veterinarians || [];
+}
+
+export async function adminCreateVeterinarian(body) {
+  return adminFetch('/admin/veterinarians', { method: 'POST', body: JSON.stringify(body) });
+}
+
+export async function adminUpdateVeterinarian(id, body) {
+  return adminFetch(`/admin/veterinarians/${id}`, { method: 'PUT', body: JSON.stringify(body) });
+}
+
+export async function adminDeleteVeterinarian(id) {
+  return adminFetch(`/admin/veterinarians/${id}`, { method: 'DELETE' });
+}
+
+export async function adminGetVetServiceTypes() {
+  const d = await adminFetch('/admin/vet-service-types');
+  return d.types || [];
+}
+
+export async function adminCreateVetServiceType(body) {
+  return adminFetch('/admin/vet-service-types', { method: 'POST', body: JSON.stringify(body) });
+}
+
+export async function adminUpdateVetServiceType(id, body) {
+  return adminFetch(`/admin/vet-service-types/${id}`, { method: 'PUT', body: JSON.stringify(body) });
+}
+
+export async function adminDeleteVetServiceType(id) {
+  return adminFetch(`/admin/vet-service-types/${id}`, { method: 'DELETE' });
+}
+
+export async function adminGetPosts() {
+  const d = await adminFetch('/admin/posts');
+  return d.posts || [];
+}
+
+export async function adminCreatePost(body) {
+  return adminFetch('/admin/posts', { method: 'POST', body: JSON.stringify(body) });
+}
+
+export async function adminUpdatePost(id, body) {
+  return adminFetch(`/admin/posts/${id}`, { method: 'PUT', body: JSON.stringify(body) });
+}
+
+export async function adminDeletePost(id) {
+  return adminFetch(`/admin/posts/${id}`, { method: 'DELETE' });
+}
+
+export async function adminGetFaqs() {
+  const d = await adminFetch('/admin/faq');
+  return d.faqs || [];
+}
+
+export async function adminCreateFaq(body) {
+  return adminFetch('/admin/faq', { method: 'POST', body: JSON.stringify(body) });
+}
+
+export async function adminUpdateFaq(id, body) {
+  return adminFetch(`/admin/faq/${id}`, { method: 'PUT', body: JSON.stringify(body) });
+}
+
+export async function adminDeleteFaq(id) {
+  return adminFetch(`/admin/faq/${id}`, { method: 'DELETE' });
+}
+
+export async function adminGetFeedback(params = {}) {
+  const q = new URLSearchParams(params).toString();
+  const d = await adminFetch(`/admin/feedback${q ? `?${q}` : ''}`);
+  return d.feedbacks || d.feedback || [];
+}
+
+export async function adminRespondFeedback(id, response) {
+  return adminFetch(`/admin/feedback/${id}/respond`, { method: 'PUT', body: JSON.stringify({ adminResponse: response }) });
+}
+
+export async function adminGetSupport() {
+  const d = await adminFetch('/admin/support');
+  return d.chats || [];
+}
+
+export async function adminGetUsers(params = {}) {
+  const q = new URLSearchParams(params).toString();
+  const d = await adminFetch(`/admin/users${q ? `?${q}` : ''}`);
+  return d.users || [];
+}
+
+export async function adminGetTrainingVideos() {
+  const d = await adminFetch('/admin/training-videos');
+  return d.videos || [];
+}
+
+export async function adminCreateTrainingVideo(body) {
+  return adminFetch('/admin/training-videos', { method: 'POST', body: JSON.stringify(body) });
+}
+
+export async function adminUpdateTrainingVideo(id, body) {
+  return adminFetch(`/admin/training-videos/${id}`, { method: 'PUT', body: JSON.stringify(body) });
+}
+
+export async function adminDeleteTrainingVideo(id) {
+  return adminFetch(`/admin/training-videos/${id}`, { method: 'DELETE' });
+}
+
+export async function adminGetPetEvents(params = {}) {
+  const q = new URLSearchParams(params).toString();
+  const d = await adminFetch(`/admin/pet-events${q ? `?${q}` : ''}`);
+  return d.events || [];
+}
+
+export async function adminCreatePetEvent(body) {
+  return adminFetch('/admin/pet-events', { method: 'POST', body: JSON.stringify(body) });
+}
+
+export async function adminUpdatePetEvent(id, body) {
+  return adminFetch(`/admin/pet-events/${id}`, { method: 'PUT', body: JSON.stringify(body) });
+}
+
+export async function adminDeletePetEvent(id) {
+  return adminFetch(`/admin/pet-events/${id}`, { method: 'DELETE' });
+}
+
+export async function adminGetHopePosts(params = {}) {
+  const q = new URLSearchParams(params).toString();
+  const d = await adminFetch(`/admin/hope-posts${q ? `?${q}` : ''}`);
+  return d.posts || [];
+}
+
+export async function adminUpdateHopePostStatus(id, status) {
+  return adminFetch(`/admin/hope-posts/${id}/status`, { method: 'PUT', body: JSON.stringify({ status }) });
+}
+
+export async function adminDeleteHopePost(id) {
+  return adminFetch(`/admin/hope-posts/${id}`, { method: 'DELETE' });
+}
+
+export async function adminGetCategories() {
+  const d = await adminFetch('/admin/categories');
+  return d.categories || [];
+}
+
+export async function adminGetSizes() {
+  const d = await adminFetch('/admin/sizes');
+  return d.sizes || [];
+}
+
+export async function adminGetDietary() {
+  const d = await adminFetch('/admin/dietary');
+  return d.dietary || [];
+}
+
+export async function adminCreateCategory(body) {
+  return adminFetch('/admin/categories', { method: 'POST', body: JSON.stringify(body) });
+}
+
+/** Update category (e.g. image) – PATCH /admin/categories/:id */
+export async function adminUpdateCategory(id, body) {
+  const d = await adminFetch(`/admin/categories/${id}`, { method: 'PATCH', body: JSON.stringify(body) });
+  return d.category;
+}
+
+export async function adminCreateSize(body) {
+  return adminFetch('/admin/sizes', { method: 'POST', body: JSON.stringify(body) });
+}
+
+export async function adminCreateDietary(body) {
+  return adminFetch('/admin/dietary', { method: 'POST', body: JSON.stringify(body) });
 }

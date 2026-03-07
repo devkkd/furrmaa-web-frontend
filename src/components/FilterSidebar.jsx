@@ -219,19 +219,10 @@ export default function FilterSidebar({ filters, onChange }) {
       (v) => String(v).toLowerCase() === String(optionValue).toLowerCase()
     );
 
-    // Category & Size = single-select: naya select karo to pehla auto-hat jaye; same pe click = deselect
-    let updatedGroup;
-    if (groupId === "category" || groupId === "size") {
-      if (isSelected) {
-        updatedGroup = [];
-      } else {
-        updatedGroup = [typeof optionValue === "string" ? optionValue : String(optionValue)];
-      }
-    } else {
-      updatedGroup = isSelected
-        ? current.filter((v) => String(v).toLowerCase() !== String(optionValue).toLowerCase())
-        : [...current, typeof optionValue === "string" ? optionValue : String(optionValue)];
-    }
+    // All filters = multi-select: toggle on/off
+    const updatedGroup = isSelected
+      ? current.filter((v) => String(v).toLowerCase() !== String(optionValue).toLowerCase())
+      : [...current, typeof optionValue === "string" ? optionValue : String(optionValue)];
 
     const newState = { ...prev, [groupId]: updatedGroup };
 

@@ -85,7 +85,13 @@ export default function Footer() {
             { label: "FAQ's", href: "/faqs" },
             { label: "Contact Us", href: "/contactus" },
           ]} />
-          <FooterCol title="Account" items={["Login/Register", "Cart", "My Orders", "Track Orders"]} />
+          <FooterCol title="Account" items={[
+            { label: "Login/Register", href: "/login" },
+            { label: "Admin Login", href: "/admin/login" },
+            "Cart",
+            "My Orders",
+            "Track Orders",
+          ]} />
         </div>
 
         {/* Divider Info Bar: Blue Tint */}

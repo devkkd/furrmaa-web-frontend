@@ -1,10 +1,12 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import { catWellnessData, dogWellnessData } from "@/data/wellness";
 import { usePetStore } from "@/store/petStore";
+import { fetchAllCategories } from "@/lib/api";
+import { AdminImage } from "@/app/admin/components/AdminImage";
 
 function titleToCategory(title) {
   const slug = (title || "").toLowerCase().trim();
@@ -12,9 +14,48 @@ function titleToCategory(title) {
   return slug;
 }
 
+/** Map API category to grid item */
+function mapCategory(item) {
+  const title = item.name || item.title;
+  const image = item.image || item.img;
+  const slug = item.slug || titleToCategory(title);
+  return { title, img: image, slug, _id: item._id };
+}
+
+const isOther = (name, slug) => {
+  const s = (slug || (name || "").toLowerCase().trim()).toLowerCase();
+  return s === "other";
+};
+
 export default function Wellness({ pet }) {
   const petType = usePetStore((state) => state.petType);
-  const data = petType === "cat" ? catWellnessData : dogWellnessData;
+  const [apiCategories, setApiCategories] = useState([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetchAllCategories()
+      .then((list) => {
+        if (!cancelled && Array.isArray(list)) {
+          const active = list.filter((c) => c.isActive !== false);
+          setApiCategories(active.map(mapCategory));
+        }
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, []);
+
+  // Static (jo pehle se photo ke sath the) + backend se jo aaye, "Other" mat dikhao
+  const staticList = petType === "cat" ? catWellnessData : dogWellnessData;
+  const staticWithSlug = staticList.map((item) => ({
+    ...item,
+    slug: item.slug || titleToCategory(item.title || item.name),
+    _id: item.id ?? item.title,
+  }));
+  const staticSlugs = new Set(staticWithSlug.map((i) => (i.slug || "").toLowerCase()));
+  const fromApi = apiCategories.filter(
+    (c) => !isOther(c.title, c.slug) && !staticSlugs.has((c.slug || "").toLowerCase())
+  );
+  const data = [...staticWithSlug, ...fromApi];
 
   return (
     <section className="w-full py-5">
@@ -44,12 +85,8 @@ export default function Wellness({ pet }) {
                     href={`/shop?category=${categorySlug}${petType ? `&petType=${petType}` : ""}`}
                     className="flex flex-col items-center block"
                   >
-                    <div className="bg-[#FCEBFF] rounded-xl p-4 flex items-center justify-center cursor-pointer hover:shadow-md transition">
-                      <img
-                        src={image}
-                        alt={title}
-                        className="h-[140px] object-contain"
-                      />
+                    <div className="bg-[#FCEBFF] rounded-xl p-4 flex items-center justify-center cursor-pointer hover:shadow-md transition min-h-[140px]">
+                      <AdminImage src={image} alt={title || ""} className="h-[140px] object-contain w-full" />
                     </div>
                     <p className="text-sm font-medium text-center pt-2">
                       {title}

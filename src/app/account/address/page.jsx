@@ -71,14 +71,14 @@ const MyAddress = () => {
                             
                             return (
                                 <div 
-                                    key={addr.id}
+                                    key={addrId}
                                     className={`flex flex-col border rounded-2xl overflow-hidden transition-all bg-white
                                         ${isSelected ? 'border-gray-200' : 'border-gray-100'}`}
                                 >
                                     {/* Address Details Body */}
                                     <div className="p-6 flex gap-4">
                                         <button 
-                                            onClick={() => setSelectedId(addr.id)}
+                                            onClick={() => setSelectedId(addrId)}
                                             className="mt-1 shrink-0"
                                         >
                                             {isSelected ? (

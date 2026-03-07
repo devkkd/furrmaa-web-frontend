@@ -59,19 +59,16 @@ function StorePageContent() {
         const petTypeValue = payload.petType ? String(payload.petType).split(",")[0].toLowerCase() : "dog";
         setPetType(petTypeValue === "cat" ? "cat" : "dog");
       }
-      // Category: clear when empty, else first slug
       if (payload.hasOwnProperty("category")) {
-        const categoryValue = payload.category && String(payload.category).trim()
-          ? String(payload.category).split(",")[0].toLowerCase().trim()
-          : null;
+        const categoryValue = payload.category && String(payload.category).trim() ? String(payload.category).toLowerCase().trim() : null;
         setFilter("category", categoryValue);
       }
       if (payload.hasOwnProperty("rating")) {
-        const ratingValue = payload.rating && String(payload.rating).trim() ? String(payload.rating).split(",")[0] : null;
+        const ratingValue = payload.rating && String(payload.rating).trim() ? payload.rating.trim() : null;
         setFilter("rating", ratingValue);
       }
       if (payload.hasOwnProperty("age")) {
-        const ageValue = payload.age && String(payload.age).trim() ? String(payload.age).split(",")[0].toLowerCase() : null;
+        const ageValue = payload.age && String(payload.age).trim() ? String(payload.age).toLowerCase().trim() : null;
         setFilter("age", ageValue);
       }
       if (payload.hasOwnProperty("size")) setFilter("size", payload.size && String(payload.size).trim() ? payload.size : null);
@@ -81,12 +78,10 @@ function StorePageContent() {
 
       const params = new URLSearchParams();
       // Sirf selected filters URL me – koi section select na ho to param mat bhejo
-      const pet = payload.hasOwnProperty("petType")
-        ? (payload.petType && String(payload.petType).trim() ? String(payload.petType).split(",")[0].toLowerCase() : null)
-        : effectivePetType;
-      const cat = payload.hasOwnProperty("category") ? (payload.category && String(payload.category).trim() ? String(payload.category).split(",")[0].toLowerCase().trim() : null) : categoryFromUrl;
-      const rating = payload.hasOwnProperty("rating") ? (payload.rating && String(payload.rating).trim() ? String(payload.rating).split(",")[0] : null) : ratingFromUrl;
-      const age = payload.hasOwnProperty("age") ? (payload.age && String(payload.age).trim() ? String(payload.age).split(",")[0].toLowerCase() : null) : ageFromUrl;
+      const pet = payload.hasOwnProperty("petType") ? (payload.petType && String(payload.petType).trim() ? String(payload.petType).toLowerCase().trim() : null) : effectivePetType;
+      const cat = payload.hasOwnProperty("category") ? (payload.category && String(payload.category).trim() ? String(payload.category).toLowerCase().trim() : null) : categoryFromUrl;
+      const rating = payload.hasOwnProperty("rating") ? (payload.rating && String(payload.rating).trim() ? payload.rating.trim() : null) : ratingFromUrl;
+      const age = payload.hasOwnProperty("age") ? (payload.age && String(payload.age).trim() ? String(payload.age).toLowerCase().trim() : null) : ageFromUrl;
       const size = payload.hasOwnProperty("size") ? (payload.size && String(payload.size).trim() ? String(payload.size).trim() : null) : sizeFromUrl;
       const dietaryVal = payload.hasOwnProperty("dietary") ? (payload.dietary && String(payload.dietary).trim() ? String(payload.dietary).trim() : null) : dietaryFromUrl;
 
@@ -109,7 +104,8 @@ function StorePageContent() {
   const effectiveAge = ageFromUrl?.trim?.() || undefined;
   const effectiveSize = sizeFromUrl?.trim?.() || undefined;
   const effectiveDietary = dietaryFromUrl?.trim?.() || undefined;
-  const minRatingNum = effectiveRating ? parseInt(String(effectiveRating).split(",")[0], 10) : undefined;
+  const ratingNums = effectiveRating ? String(effectiveRating).split(",").map((r) => parseInt(r.trim(), 10)).filter((n) => !isNaN(n)) : [];
+  const minRatingNum = ratingNums.length > 0 ? Math.min(...ratingNums) : undefined;
 
   const { products: apiProducts, loading } = useProducts({
     petType: effectivePetType,
@@ -127,16 +123,12 @@ function StorePageContent() {
   };
 
   const filteredProducts = apiProducts.filter((p) => {
-    // Category filter - case-insensitive matching
     if (effectiveCategory) {
       const productCategory = normalizeCategory(p.category);
-      const filterCategory = normalizeCategory(effectiveCategory);
-      if (productCategory !== filterCategory) return false;
+      const filterCats = effectiveCategory.split(",").map((c) => normalizeCategory(c.trim())).filter(Boolean);
+      if (filterCats.length && !filterCats.includes(productCategory)) return false;
     }
-    
-    // Rating filter
     if (minRatingNum != null && (p.rating || 0) < minRatingNum) return false;
-    
     return true;
   });
 
