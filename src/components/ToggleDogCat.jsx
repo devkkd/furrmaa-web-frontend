@@ -29,7 +29,7 @@ export default function ToggleDogCat({ onShopPage, currentPetType, onPetTypeChan
       <button
         onClick={() => handleClick('cat')}
         className={`flex-1 h-full rounded-full flex items-center justify-center gap-2 text-sm font-medium transition
-          ${active === 'cat' ? 'bg-[#1F2E46] text-white' : 'text-gray-400'}
+          ${active === 'cat' ? 'bg-[#95E562] text-gray-900' : 'text-gray-400'}
         `}
       >
         🐱 Cat Essentials

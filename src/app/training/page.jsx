@@ -73,11 +73,11 @@ const PetTrainingPage = () => {
                       <p className={`text-sm ${tier.textColor} opacity-80 mb-6 max-w-[200px]`}>
                         {tier.description}
                       </p>
-                      <div className="flex flex-wrap gap-2">
+                      <div className="flex flex-wrap gap-2 w-50">
                         {(tier.tags || []).map((tag, i) => (
                           <span
                             key={i}
-                            className="bg-white/20 text-[9px] font-bold px-3 py-1 rounded-full border border-white/30"
+                            className={`text-[12px] font-bold px-3 py-1 rounded-full border ${tier.textColor}  border-black/30`}
                           >
                             {tag}
                           </span>
@@ -107,7 +107,7 @@ const PetTrainingPage = () => {
                 <h3 className="text-2xl font-extrabold mb-4">{currentPlan?.title}</h3>
                 <p className="text-lg font-bold opacity-80 uppercase tracking-widest">Lessons</p>
               </div>
-              <div className="bg-[#a3e635]/40 p-6 rounded-2xl w-full md:w-[450px]">
+              <div className="bg-[#95E562]/40 p-6 rounded-2xl w-full md:w-[450px]">
                 <div className="flex justify-between text-xs font-bold text-gray-800 mb-2">
                   <span>Learning Progress</span>
                   <span>{progressByPlan[selectedPlan] ?? 0}%</span>

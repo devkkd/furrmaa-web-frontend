@@ -8,6 +8,7 @@ import { usePetStore } from '@/store/petStore';
 import WhyChooseFurrmaa from '@/components/WhyChooseFurrmaa';
 import Container from '@/components/Container';
 import { markTrainingProgressComplete, fetchTrainingVideoById } from '@/lib/api';
+import InstructorCard from '@/components/InstructorCard';
 
 function videoToLesson(video, index = 0) {
   const duration = video.duration || 5;
@@ -16,13 +17,14 @@ function videoToLesson(video, index = 0) {
     _id: video._id,
     title: video.title || '(Video Title)',
     lessonNum: `${index + 1} Lesson`,
-    time: `${index + 1} Day | ${duration} min`,
+    time: `${index + 1} Day | 4:56 Min`, // Hardcoded to match UI, ideally replace with dynamic video duration
     duration,
     image: video.thumbnail || `/images/lessons/lesson${(index % 7) + 1}.png`,
     videoUrl: video.videoUrl,
-    description: video.description || 'This lesson covers the fundamentals of basic training and bonding.',
+    description: video.description || '',
     completed: false,
     isActive: video.isFree !== false,
+    instructor: video.instructor
   };
 }
 
@@ -62,6 +64,7 @@ const TrainingLessonPage = () => {
   };
 
   if (loading && !lessonFromBackend && !lessonFromList) return <Container><p className="py-12 text-gray-500">Loading...</p></Container>;
+  
   if (error && !currentLesson) {
     return (
       <Container>
@@ -73,22 +76,27 @@ const TrainingLessonPage = () => {
       </Container>
     );
   }
+  
   if (!currentLesson && !loadingLesson) return <div className="p-8 text-gray-600">Lesson not found</div>;
   if (loadingLesson && !lessonFromList && !lessonFromBackend) return <Container><p className="py-12 text-gray-500">Loading lesson...</p></Container>;
 
   const progress = progressByPlan[plan] ?? 0;
-  const pageTitle = currentPlan?.title || (plan ? `${String(plan).charAt(0).toUpperCase() + String(plan).slice(1)} Training` : 'Training');
+  const pageTitle = currentPlan?.title || (plan ? `${String(plan).charAt(0).toUpperCase() + String(plan).slice(1)} Training` : 'Basic Training');
   const sidebarLessons = currentPlan?.sessions ?? (currentLesson ? [currentLesson] : []);
 
   return (
     <>
       <Container>
-        <h1 className="text-3xl font-extrabold pt-10">{pageTitle}</h1>
-        <section className="flex gap-10 mt-6">
-          <div className="flex-1">
+        <div className="pt-10">
+          <p className="text-sm text-gray-600 mb-2">Pet Training</p>
+          <h1 className="text-3xl font-extrabold">{pageTitle}</h1>
+        </div>
+        
+        <section className="flex flex-col lg:flex-row gap-8 mt-6">
+          <div className="flex-1 min-w-0">
             <VideoPlayer lesson={currentLesson} onMarkComplete={handleMarkComplete} />
           </div>
-          <div className="w-[380px] shrink-0">
+          <div className="w-full lg:w-[380px] shrink-0">
             <LessonSidebar
               lessons={sidebarLessons}
               activeLessonId={currentLesson.id || currentLesson._id}
@@ -97,6 +105,8 @@ const TrainingLessonPage = () => {
             />
           </div>
         </section>
+        
+        <InstructorCard instructor={currentLesson?.instructor} />
       </Container>
       <WhyChooseFurrmaa />
     </>

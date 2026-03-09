@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 
 export default function PetCard() {
   return (
@@ -12,8 +13,11 @@ export default function PetCard() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Main Card (Orange) */}
-          <div className="lg:col-span-2 bg-[#FFE1A8] rounded-3xl p-6 md:p-8 flex flex-col md:flex-row gap-8 relative overflow-hidden">
+          {/* Main Card (Orange) - Now a clickable Link */}
+          <Link 
+            href="/training" 
+            className="lg:col-span-2 bg-[#FFE1A8] rounded-3xl p-6 md:p-8 flex flex-col md:flex-row gap-8 relative overflow-hidden group cursor-pointer hover:shadow-lg transition-all duration-300"
+          >
             
             {/* Left Content Side */}
             <div className="flex-1 flex flex-col justify-between z-10">
@@ -40,9 +44,10 @@ export default function PetCard() {
 
               {/* Call to Action + Puppy Layout */}
               <div className="flex items-center justify-between md:justify-start gap-4 mt-8 md:mt-0">
-                <button className="text-2xl font-bold text-gray-900 hover:translate-x-1 transition-transform">
+                {/* Changed from button to div for valid HTML nesting inside Link, added group-hover */}
+                <div className="text-2xl font-bold text-gray-900 group-hover:translate-x-2 transition-transform duration-300">
                   Let’s Start →
-                </button>
+                </div>
                 {/* Puppy image - Positioned relative to this flex container on mobile */}
                 <img
                   src="/images/CardTwo/p1.png"
@@ -54,7 +59,7 @@ export default function PetCard() {
 
             {/* Right Video Side */}
             <div className="flex-1">
-              <div className="relative group">
+              <div className="relative group/video">
                 <img
                   src="/images/CardTwo/p2.png"
                   alt="training video"
@@ -68,15 +73,16 @@ export default function PetCard() {
                   <p className="text-gray-700 text-xs">1 Lesson | 1 Day | 4:56 Min</p>
                 </div>
 
-                <button className="bg-[#1F2E46] hover:bg-[#2a3c5a] text-white text-sm font-semibold px-6 py-2.5 rounded-full flex items-center gap-2 transition-colors">
+                {/* Changed from button to div for valid HTML nesting inside Link */}
+                <div className="bg-[#1F2E46] group-hover:bg-[#2a3c5a] text-white text-sm font-semibold px-6 py-2.5 rounded-full flex items-center gap-2 transition-colors">
                   <span className="w-4 h-4 bg-white rounded-full flex items-center justify-center">
                     <div className="border-l-4 border-l-[#1F2E46] border-y-[3px] border-y-transparent ml-0.5" />
                   </span>
                   Play
-                </button>
+                </div>
               </div>
             </div>
-          </div>
+          </Link>
 
           {/* Side Card (Blue) */}
           <div className="bg-[#D9E9FF] rounded-3xl p-6 md:p-8 flex flex-col justify-between relative overflow-hidden min-h-[300px]">
