@@ -175,19 +175,21 @@ function StorePageContent() {
               </div>
             </div>
           )}
-          <div className="flex-1 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-10">
-            {loading ? (
-              <p className="text-gray-500 col-span-full">Loading...</p>
-            ) : (
-              <>
-                {filteredProducts.map((product) => (
-                  <ProductCard key={product.id} product={product} />
-                ))}
-                {filteredProducts.length === 0 && (
-                  <p className="text-gray-900 col-span-full">No products found</p>
-                )}
-              </>
-            )}
+          <div className="flex-1">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+              {loading ? (
+                <p className="text-gray-500 col-span-full">Loading...</p>
+              ) : (
+                <>
+                  {filteredProducts.map((product) => (
+                    <ProductCard key={product.id} product={product} />
+                  ))}
+                  {filteredProducts.length === 0 && (
+                    <p className="text-gray-900 col-span-full">No products found</p>
+                  )}
+                </>
+              )}
+            </div>
           </div>
         </div>
       </div>

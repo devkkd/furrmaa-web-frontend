@@ -17,14 +17,14 @@ export default function ProductCard({ product }) {
   }
 
   return (
-    <Link href={`/shop/product_details/${product.id}`}>
-      <div className="bg-white text-black rounded-xl p-3 flex flex-col justify-around hover:shadow-md transition cursor-pointer">
+    <Link href={`/shop/product_details/${product.id}`} className="block">
+      <div className="bg-white text-black border border-gray-200 rounded-xl p-3 flex flex-col h-[340px] hover:shadow-md transition cursor-pointer">
 
-        <div className="relative flex items-center justify-center">
+        <div className="relative flex items-center justify-center h-[180px] mb-2">
           <img
             src={product.image}
             alt={product.name}
-            className="h-[180px] object-contain"
+            className="h-full w-full object-contain"
           />
           <button
             className="absolute top-2 right-2"
@@ -34,11 +34,11 @@ export default function ProductCard({ product }) {
           </button>
         </div>
 
-        <p className="mt-2 text-sm font-medium leading-snug line-clamp-2">
+        <p className="text-sm font-medium leading-snug line-clamp-2 h-[40px] mb-1">
           {product.name}
         </p>
 
-        <div className="flex items-center gap-1 mt-1">
+        <div className="flex items-center gap-1 mb-2">
           {[...Array(rating)].map((_, i) => (
             <FaStar key={i} className="text-yellow-400 text-xs" />
           ))}
@@ -47,7 +47,7 @@ export default function ProductCard({ product }) {
           </span>
         </div>
 
-        <div className="flex items-center justify-between gap-2 mt-2">
+        <div className="flex items-center justify-between gap-2 mb-2">
           <span className="text-base font-semibold">₹{product.price}</span>
           {product.oldPrice != null && (
             <span className="text-sm text-gray-400 line-through">
@@ -57,7 +57,7 @@ export default function ProductCard({ product }) {
         </div>
 
         <button
-          className="mt-2 w-full border border-gray-300 rounded-xl py-2 text-sm font-medium hover:bg-black hover:text-white transition"
+          className="mt-auto w-full border border-gray-300 rounded-xl py-2 text-sm font-medium hover:bg-black hover:text-white transition"
           onClick={handleAdd}
         >
           ADD
