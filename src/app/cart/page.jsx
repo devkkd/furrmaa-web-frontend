@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useCartStore } from '@/store/cartStore';
 import Container from '@/components/Container';
@@ -30,7 +30,7 @@ async function fetchAddresses() {
 // Placeholder image to avoid 404 (no local /images/products/p1.png)
 const PLACEHOLDER_IMG = 'https://placehold.co/80x80/e5e7eb/6b7280?text=Pet';
 
-export default function CartPage() {
+function CartContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const items = useCartStore((s) => s.items);
@@ -231,6 +231,25 @@ export default function CartPage() {
         </div>
       </Container>
     </section>
+  );
+}
+
+export default function CartPage() {
+  return (
+    <Suspense fallback={
+      <section className="min-h-[60vh] flex items-center justify-center py-16">
+        <Container>
+          <div className="text-center">
+            <div className="animate-pulse">
+              <div className="h-8 w-48 bg-gray-200 rounded mx-auto mb-4" />
+              <div className="h-4 w-64 bg-gray-200 rounded mx-auto" />
+            </div>
+          </div>
+        </Container>
+      </section>
+    }>
+      <CartContent />
+    </Suspense>
   );
 }
 
