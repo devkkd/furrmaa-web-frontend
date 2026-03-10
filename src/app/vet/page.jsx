@@ -5,9 +5,12 @@ import Container from '@/components/Container';
 import { HiOutlineLocationMarker, HiOutlineSearch, HiPhone } from 'react-icons/hi';
 import { RiDirectionLine } from 'react-icons/ri';
 import { LuArrowUpDown } from 'react-icons/lu';
+import { IoChevronBack, IoChevronForward } from 'react-icons/io5';
 import WhyChooseFurrmaa from '@/components/WhyChooseFurrmaa';
 import { useVetServices } from '@/hooks/useVetServices';
 import { useGeolocation } from '@/hooks/useGeolocation';
+
+const ITEMS_PER_PAGE = 10;
 
 const Vet = () => {
     const [selectedCategory, setSelectedCategory] = useState('All');
@@ -16,6 +19,7 @@ const Vet = () => {
     const [showSortDropdown, setShowSortDropdown] = useState(false);
     const [showLocationModal, setShowLocationModal] = useState(false);
     const [manualLocation, setManualLocation] = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
     const { location, loading: locLoading, error: locError, fetchCurrentLocation, setLocation } = useGeolocation('');
 
     React.useEffect(() => { fetchCurrentLocation(); }, [fetchCurrentLocation]);
@@ -53,6 +57,44 @@ const Vet = () => {
         if (sortBy === 'farthest') list.reverse();
         return list;
     }, [services, searchQuery, sortBy]);
+
+    // Reset to page 1 when filters change
+    React.useEffect(() => {
+        setCurrentPage(1);
+    }, [selectedCategory, searchQuery, sortBy]);
+
+    // Pagination calculations
+    const totalPages = Math.ceil(filteredServices.length / ITEMS_PER_PAGE);
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const endIndex = startIndex + ITEMS_PER_PAGE;
+    const currentServices = filteredServices.slice(startIndex, endIndex);
+
+    // Generate page numbers to display
+    const getPageNumbers = () => {
+        const pages = [];
+        const maxVisible = 5;
+        
+        if (totalPages <= maxVisible) {
+            for (let i = 1; i <= totalPages; i++) {
+                pages.push(i);
+            }
+        } else {
+            if (currentPage <= 3) {
+                for (let i = 1; i <= maxVisible; i++) {
+                    pages.push(i);
+                }
+            } else if (currentPage >= totalPages - 2) {
+                for (let i = totalPages - maxVisible + 1; i <= totalPages; i++) {
+                    pages.push(i);
+                }
+            } else {
+                for (let i = currentPage - 2; i <= currentPage + 2; i++) {
+                    pages.push(i);
+                }
+            }
+        }
+        return pages;
+    };
 
     const openCall = (phone) => {
         if (!phone) return;
@@ -195,7 +237,7 @@ const Vet = () => {
                                 className={`whitespace-nowrap px-5 py-2.5 rounded-full text-sm font-medium transition-all
                                     ${selectedCategory === cat
                                         ? 'bg-[#1e293b] text-white shadow-md'
-                                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+                                        : 'bg-gray-200 text-gray-600 hover:bg-gray-200'}`}
                             >
                                 {cat}
                             </button>
@@ -207,64 +249,101 @@ const Vet = () => {
                     ) : filteredServices.length === 0 ? (
                         <p className="text-gray-500 py-12">No vet services found. Try adjusting your search or filters.</p>
                     ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-                            {filteredServices.map((item, idx) => (
-                                <div
-                                    key={item.id || idx}
-                                    className="flex flex-row gap-3 p-3 md:gap-4 md:p-4 bg-white border border-gray-100 rounded-2xl transition-all hover:shadow-md"
-                                >
-                                    <div className="w-28 h-28 sm:w-32 sm:h-32 shrink-0 rounded-xl overflow-hidden bg-gray-100">
-                                        {item.image && (item.image.startsWith('http') || item.image.startsWith('/')) ? (
-                                            <img
-                                                src={item.image}
-                                                alt={item.name}
-                                                className="w-full h-full object-cover"
-                                            />
-                                        ) : (
-                                            <div className="w-full h-full flex items-center justify-center text-3xl">🏥</div>
-                                        )}
-                                    </div>
-
-                                    <div className="flex-1 flex flex-col justify-between min-w-0">
-                                        <div>
-                                            <div className="flex items-center gap-2 flex-wrap mb-1">
-                                                <h3 className="text-base md:text-lg font-extrabold text-gray-900 uppercase truncate leading-tight">
-                                                    {item.name}
-                                                </h3>
-                                                <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-[#DBEAFE] text-[#1E3A8A] shrink-0">
-                                                    {item.type || item.category || 'Service'}
-                                                </span>
-                                            </div>
-                                            <div className="flex items-center gap-1 text-gray-400 text-xs mb-1.5 font-medium">
-                                                <HiOutlineLocationMarker className="shrink-0" />
-                                                <span className="truncate">{item.distance}</span>
-                                            </div>
-                                            <p className="text-[10px] md:text-[11px] text-gray-500 leading-relaxed line-clamp-2 font-medium">
-                                                {item.address}
-                                            </p>
+                        <>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                                {currentServices.map((item, idx) => (
+                                    <div
+                                        key={item.id || idx}
+                                        className="flex flex-row gap-3 p-3 md:gap-4 md:p-4 bg-white border border-gray-100 rounded-2xl transition-all hover:shadow-md"
+                                    >
+                                        <div className="w-28 h-28 sm:w-32 sm:h-32 shrink-0 rounded-xl overflow-hidden bg-gray-100">
+                                            {item.image && (item.image.startsWith('http') || item.image.startsWith('/')) ? (
+                                                <img
+                                                    src={item.image}
+                                                    alt={item.name}
+                                                    className="w-full h-full object-cover"
+                                                />
+                                            ) : (
+                                                <div className="w-full h-full flex items-center justify-center text-3xl">🏥</div>
+                                            )}
                                         </div>
 
-                                        <div className="flex items-center gap-3 mt-3">
-                                            <button
-                                                onClick={() => openCall(item.phone)}
-                                                className="flex items-center justify-center gap-1.5 bg-[#8B5FBF] text-white px-4 py-2 rounded-full text-[11px] md:text-xs font-bold hover:bg-[#7c3aed] transition shadow-sm min-w-[80px] disabled:opacity-50"
-                                                disabled={!item.phone}
-                                            >
-                                                <HiPhone className="text-sm" />
-                                                Call
-                                            </button>
-                                            <button
-                                                onClick={() => openDirection(item.address)}
-                                                className="flex items-center gap-1.5 text-gray-600 text-[11px] md:text-xs font-bold hover:text-gray-900 transition"
-                                            >
-                                                <RiDirectionLine className="text-lg" />
-                                                Direction
-                                            </button>
+                                        <div className="flex-1 flex flex-col justify-between min-w-0">
+                                            <div>
+                                                <div className="flex items-center gap-2 flex-wrap mb-1">
+                                                    <h3 className="text-base md:text-lg font-extrabold text-gray-900 uppercase truncate leading-tight">
+                                                        {item.name}
+                                                    </h3>
+                                                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-[#DBEAFE] text-[#1E3A8A] shrink-0">
+                                                        {item.type || item.category || 'Service'}
+                                                    </span>
+                                                </div>
+                                                <div className="flex items-center gap-1 text-gray-400 text-xs mb-1.5 font-medium">
+                                                    <HiOutlineLocationMarker className="shrink-0" />
+                                                    <span className="truncate">{item.distance}</span>
+                                                </div>
+                                                <p className="text-[10px] md:text-[11px] text-gray-500 leading-relaxed line-clamp-2 font-medium">
+                                                    {item.address}
+                                                </p>
+                                            </div>
+
+                                            <div className="flex items-center gap-3 mt-3">
+                                                <button
+                                                    onClick={() => openCall(item.phone)}
+                                                    className="flex items-center justify-center gap-1.5 bg-[#8B5FBF] text-white px-4 py-2 rounded-full text-[11px] md:text-xs font-bold hover:bg-[#7c3aed] transition shadow-sm min-w-[80px] disabled:opacity-50"
+                                                    disabled={!item.phone}
+                                                >
+                                                    <HiPhone className="text-sm" />
+                                                    Call
+                                                </button>
+                                                <button
+                                                    onClick={() => openDirection(item.address)}
+                                                    className="flex items-center gap-1.5 text-gray-600 text-[11px] md:text-xs font-bold hover:text-gray-900 transition"
+                                                >
+                                                    <RiDirectionLine className="text-lg" />
+                                                    Direction
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
+                                ))}
+                            </div>
+
+                            {/* Pagination */}
+                            {totalPages > 1 && (
+                                <div className="flex items-center justify-center gap-2 mt-8 mb-4">
+                                    <button
+                                        onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                                        disabled={currentPage === 1}
+                                        className="w-10 h-10 flex items-center justify-center rounded-full text-gray-600 hover:bg-gray-100 transition disabled:opacity-40 disabled:cursor-not-allowed"
+                                    >
+                                        <IoChevronBack className="text-xl" />
+                                    </button>
+
+                                    {getPageNumbers().map((page) => (
+                                        <button
+                                            key={page}
+                                            onClick={() => setCurrentPage(page)}
+                                            className={`w-10 h-10 flex items-center justify-center rounded-full text-sm font-medium transition ${
+                                                currentPage === page
+                                                    ? 'bg-[#1F2E46] text-white'
+                                                    : 'text-gray-600 hover:bg-gray-100'
+                                            }`}
+                                        >
+                                            {page}
+                                        </button>
+                                    ))}
+
+                                    <button
+                                        onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                                        disabled={currentPage === totalPages}
+                                        className="w-10 h-10 flex items-center justify-center rounded-full text-gray-600 hover:bg-gray-100 transition disabled:opacity-40 disabled:cursor-not-allowed"
+                                    >
+                                        <IoChevronForward className="text-xl" />
+                                    </button>
                                 </div>
-                            ))}
-                        </div>
+                            )}
+                        </>
                     )}
                 </div>
             </Container>

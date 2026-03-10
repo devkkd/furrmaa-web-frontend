@@ -10,18 +10,18 @@ const AboutUs = () => {
                 <div className="max-w-7xl pl-9 pr-8 md:pl-9 md:pr-9 ">
                     {/* --- EXISTING TOP SECTION --- */}
                     <div className="">
-                        <h2 className="text-xl mb-3 md:text-2xl font-bold text-gray-800">
+                        <h2 className="text-2xl mb-3 md:text-4xl font-extrabold text-gray-800">
                             About Us
                         </h2>
-                        <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-black tracking-tight leading-tight mb-6">
+                        <h1 className="text-4xl my-7 md:text-5xl lg:text-6xl font-bold text-black tracking-tight leading-tight mb-6">
                             Reimagining Pet Care in India
                         </h1>
                     </div>
 
                     <div className="space-y-6 max-w-6xl text-[#0E0E0E]">
                         <p className=" md:text-xl leading-relaxed">
-                            <span className="font-extrabold uppercase tracking-wide">Furrmaa</span> is
-                            India's emerging AI-powered pet care ecosystem, built to simplify pet parenting
+                            <span className="font-bold  tracking-wide">Furrmaa is
+                            India's emerging AI-powered pet care ecosystem </span>, built to simplify pet parenting
                             and create sustainable growth opportunities for pet care businesses.
                         </p>
                         <p className="md:text-lg leading-relaxed">
@@ -53,7 +53,7 @@ const AboutUs = () => {
                             {/* Left Column: Pet Parents */}
                             <div>
                                 <h3 className="text-lg font-bold mb-6 text-black">Pet parents often face:</h3>
-                                <ul className="space-y-4 text-[#0E0E0E]">
+                                <ul className="space-y-2 text-[#0E0E0E]">
                                     <li className="flex items-start gap-2">
                                         <span>→</span> Difficulty finding trustworthy vets and services nearby
                                     </li>
@@ -72,7 +72,7 @@ const AboutUs = () => {
                             {/* Right Column: Businesses */}
                             <div className="md:border-l md:pl-12 border-gray-300">
                                 <h3 className="text-lg font-bold mb-6 text-black">Meanwhile, pet care businesses struggle with:</h3>
-                                <ul className="space-y-4 text-[#0E0E0E]">
+                                <ul className="space-y-2 text-[#0E0E0E]">
                                     <li className="flex items-start gap-2">
                                         <span>→</span> Limited digital visibility
                                     </li>
@@ -90,14 +90,14 @@ const AboutUs = () => {
                         </div>
 
                         <div className="mt-12 text-center">
-                            <h3 className="text-lg md:text-2xl font-bold text-black mb-2">
+                            <h3 className="text-lg md:text-xl font-bold text-black mb-2">
                                 Good pet care exists - but it is hard to find.
                             </h3>
                             <div className='flex  justify-center gap-1.5'>
                                 {/* <p className="text-xl md:text-2xl font-extrabold text-black uppercase">
                                     FURRMAA
                                 </p> */}
-                                <p className='text-lg md:text-2xl text-black'> <span className='font-extrabold text-black' >FURRMAA</span> was created to solve this exact problem.</p>
+                                <p className='text-lg md:text-xl text-black'> <span className='font-extrabold text-black' >FURRMAA</span> was created to solve this exact problem.</p>
                             </div>
                         </div>
                     </div>
@@ -106,10 +106,10 @@ const AboutUs = () => {
                     <div className="flex flex-col lg:flex-row items-center gap-12 mt-12 md:mt-20">
                         {/* Content */}
                         <div className="flex-1 space-y-6 text-[#0E0E0E]">
-                            <h2 className="text-3xl md:text-4xl font-extrabold text-black">
+                            <h2 className="text-3xl md:text-3xl font-extrabold text-black">
                                 What is FURRMAA?
                             </h2>
-                            <p className="md:text-lg leading-relaxed">
+                            <p className="md:text-md leading-relaxed">
                                 <span className="font-bold">FURRMAA</span> is a unified pet care platform that connects pet parents with verified
                                 products, services, veterinarians, hostels, groomers, trainers, NGOs, and trusted
                                 local partners - on one intelligent platform.
@@ -119,9 +119,9 @@ const AboutUs = () => {
                                 care simpler, faster, and more dependable.
                             </p>
 
-                            <div className="pt-4">
-                                <h3 className="text-xl font-extrabold text-black mb-6">FURRMAA is designed for</h3>
-                                <ul className="space-y-3">
+                            <div className="pt-2">
+                                <h3 className="text-xl font-extrabold text-black mb-4">FURRMAA is designed for</h3>
+                                <ul className="space-y-1">
                                     <li className="flex items-center gap-2"><span>→</span> Daily pet needs</li>
                                     <li className="flex items-center gap-2"><span>→</span> Preventive care</li>
                                     <li className="flex items-center gap-2"><span>→</span> Emergency support</li>
@@ -208,16 +208,16 @@ const EcoSystem = () => {
                         </div>
 
                         {/* Text Column */}
-                        <div className="flex-1 space-y-8 text-left md:text-right lg:text-right">
-                            <h2 className="text-4xl md:text-5xl font-extrabold text-black">
+                        <div className="flex-1 space-y-6 text-left md:text-right lg:text-right">
+                            <h2 className="text-3xl md:text-3xl font-extrabold text-black">
                                 Our Ecosystem Approach
                             </h2>
 
-                            <p className="md:text-lg text-gray-800 leading-relaxed max-w-xl ml-auto">
+                            <p className="md:text-md text-gray-800 leading-relaxed max-w-xl ml-auto">
                                 Unlike traditional marketplaces or directories, <span className="font-bold text-black">FURRMAA</span> is built as an <span className="font-bold text-black">ecosystem</span>, not a listing site.
                             </p>
 
-                            <p className="md:text-lg text-gray-800 leading-relaxed max-w-xl ml-auto">
+                            <p className="md:text-md text-gray-800 leading-relaxed max-w-xl ml-auto">
                                 Every feature, partner, and recommendation is designed to work together - ensuring clarity for pet parents and sustainable growth for businesses.
                             </p>
 
@@ -230,12 +230,12 @@ const EcoSystem = () => {
                                 />
                             </div>
 
-                            <div className="pt-4 ">
-                                <h3 className="text-2xl font-bold text-black mb-6">Our ecosystem includes</h3>
-                                <ul className="space-y-3 text-gray-800">
+                            <div className="pt-2 ">
+                                <h3 className="text-2xl font-bold text-black mb-4">Our ecosystem includes</h3>
+                                <ul className="space-y-2 text-gray-800">
                                     {ecosystemItems.map((item, index) => (
                                         <li key={index} className="flex items-center justify-start md:justify-end gap-2 ">
-                                            {item} <span className="text-gray-400">→</span>
+                                          <span className="">→</span>  {item} 
                                         </li>
                                     ))}
                                 </ul>
@@ -245,7 +245,7 @@ const EcoSystem = () => {
 
                     {/* --- WHAT MAKES FURRMAA DIFFERENT --- */}
                     <div className="mt-16">
-                        <h2 className="text-center text-4xl md:text-5xl font-extrabold text-black mb-10">
+                        <h2 className="text-center text-3xl md:text-4xl font-extrabold text-black mb-10">
                             What Makes FURRMAA Different
                         </h2>
 
@@ -255,7 +255,7 @@ const EcoSystem = () => {
                                 <div
                                     key={card.id}
                                     className="p-4.5 rounded-[24px] border border-gray-200 transition-all duration-300 cursor-default
-                                               hover:scale-105 hover:shadow-xl hover:border-transparent group h-full flex flex-col"
+                                               hover:scale-105 hover:shadow-xl hover:border-transparent group flex flex-col"
                                     style={{
                                         '--hover-bg': 'linear-gradient(180deg, #F3F8FF 0%, #C0DBFF 100%)'
                                     }}
@@ -265,7 +265,7 @@ const EcoSystem = () => {
                                     <span className="text-xl font-bold text-black mb-4 block">
                                         {card.id}
                                     </span>
-                                    <h4 className="text-xl font-extrabold text-black mb-3 leading-tight">
+                                    <h4 className="text-lg font-extrabold text-black mb-3 leading-tight">
                                         {card.title}
                                     </h4>
                                     <p className="text-sm text-gray-800 leading-relaxed font-medium">
@@ -313,7 +313,7 @@ const OurMssionAndPartner = () => {
                 <div className="max-w-7xl">
 
                     {/* --- OUR MISSION & VISION HERO --- */}
-                    <div className="flex flex-col md:block">
+                    <div className="flex flex-col md:block my-8">
                         {/* Mobile Header (Visible only on small screens) */}
                         <div className="block md:hidden space-y-8 mb-6">
                             <div className="space-y-4">
@@ -325,7 +325,7 @@ const OurMssionAndPartner = () => {
                         </div>
 
                         {/* Main Container */}
-                        <div className="relative aspect-[16/9] md:aspect-[15/6.5] h-full w-full overflow-hidden rounded-[10px] md:rounded-[15px] shadow-xl">
+                        <div className="relative aspect-[16/9] md:aspect-[15/5.5] h-full w-full overflow-hidden rounded-[10px] md:rounded-[15px] shadow-xl">
                             {/* Background Image */}
                             <img
                                 src="/images/AboutFurrmaa/about4.png"
@@ -342,11 +342,11 @@ const OurMssionAndPartner = () => {
                                 {/* Mission - Left Side */}
                                 <div className="flex-1 flex flex-col justify-around">
                                     {/* Red Circle Position: Heading at the top */}
-                                    <h2 className="text-4xl md:text-5xl font-extrabold">Our Mission</h2>
+                                    <h2 className="text-4xl md:text-4xl font-bold">Our Mission</h2>
 
                                     {/* Blue Box Position: Content at the bottom */}
-                                    <div className="max-w-sm">
-                                        <p className="text-lg md:text-xl leading-11 opacity-90">
+                                    <div className="max-w-xs">
+                                        <p className="text-lg md:text-lg leading-10 opacity-90">
                                             To simplify pet parenting and empower pet care businesses by building a trusted, intelligent, and locally connected pet care ecosystem.
                                         </p>
                                     </div>
@@ -355,11 +355,11 @@ const OurMssionAndPartner = () => {
                                 {/* Vision - Right Side (Exact Opposite) */}
                                 <div className="flex-1 flex flex-col justify-around text-right">
                                     {/* Heading at the top */}
-                                    <h2 className="text-4xl md:text-5xl font-extrabold">Our Vision</h2>
+                                    <h2 className="text-4xl md:text-4xl font-bold">Our Vision</h2>
 
                                     {/* Content at the bottom */}
-                                    <div className="max-w-sm ml-auto">
-                                        <p className="text-lg md:text-xl leading-11 opacity-90  ">
+                                    <div className="max-w-xs ml-auto">
+                                        <p className="text-lg md:text-lg leading-10 opacity-90  ">
                                             To become India's most trusted digital companion for pet care where every pet parent feels confident, and every quality service provider grows sustainably.
                                         </p>
                                     </div>
@@ -379,10 +379,10 @@ const OurMssionAndPartner = () => {
                     {/* --- WHO WE PARTNER WITH --- */}
                     <div className="text-center space-y-12 py-12 mt-3">
                         <div className="space-y-4">
-                            <h2 className="text-4xl md:text-5xl font-extrabold text-black mb-10">
+                            <h2 className="text-4xl md:text-4xl font-extrabold text-black mb-10">
                                 Who We Partner With
                             </h2>
-                            <p className="text-lg md:text-xl text-gray-800 mb-12 md:mb-20">
+                            <p className="text-lg md:text-lg text-gray-800 mb-12 md:mb-20">
                                 <span className="font-extrabold text-black">FURRMAA</span>
                                 <span className='text-black ml-1.5'>
                                     collaborates with responsible and committed pet care professionals, including:
@@ -395,10 +395,10 @@ const OurMssionAndPartner = () => {
                             {partners.map((partner, index) => (
                                 <div
                                     key={index}
-                                    className={`px-6 h-full flex items-center justify-center border-gray-300 
-                                        ${index !== partners.length - 1 ? 'lg:border-r' : ''}`}
+                                    className={`px-6 h-full flex items-center  justify-center border-gray-300 
+                                        ${index !== partners.length - 1 ? 'lg:border-r ' : ''}`}
                                 >
-                                    <p className=" text-black leading-tight">
+                                    <p className=" text-black ">
                                         {partner}
                                     </p>
                                 </div>
@@ -406,7 +406,7 @@ const OurMssionAndPartner = () => {
                         </div>
 
                         <div className="pt-4 max-w-6xl mx-auto">
-                            <p className="text-lg md:text-xl text-gray-800">
+                            <p className="text-lg md:text-lg text-gray-800">
                                 If you care for pets professionally and value trust, consistency, and long-term growth - you belong with <span className="font-extrabold text-black">FURRMAA</span>.
                             </p>
                         </div>
@@ -414,10 +414,10 @@ const OurMssionAndPartner = () => {
                     {/* --- WHY PET PARENTS TRUST FURRMAA --- */}
                     <div className="text-center space-y-12 py-12 mt-3 border-t border-gray-200">
                         <div className="space-y-4">
-                            <h2 className="text-4xl md:text-5xl font-extrabold text-black mb-10">
+                            <h2 className="text-4xl md:text-4xl font-extrabold text-black mb-10">
                                 Why Pet Parents Trust FURRMAA
                             </h2>
-                            <p className="text-lg md:text-xl text-gray-800 mb-20">
+                            <p className="text-lg md:text-lg text-gray-800 mb-20">
                                 Trust is not a feature it is a foundation. We build trust through:
                             </p>
                         </div>
@@ -438,7 +438,7 @@ const OurMssionAndPartner = () => {
                         </div>
 
                         <div className="pt-4">
-                            <p className="text-lg font-extrabold text-black tracking-wider">
+                            <p className="text-lg font-extrabold text-black ">
                                 Less searching. More caring.
                             </p>
                         </div>
@@ -447,10 +447,10 @@ const OurMssionAndPartner = () => {
                     {/* --- HELPING PET BUSINESSES GROW --- */}
                     <div className="text-center space-y-12 pt-10 border-t border-gray-200">
                         <div className="space-y-4">
-                            <h2 className="text-4xl md:text-5xl font-extrabold text-black mb-10">
+                            <h2 className="text-4xl md:text-4xl font-extrabold text-black mb-10">
                                 Helping Pet Businesses Grow The Right Way
                             </h2>
-                            <p className="text-lg md:text-xl text-gray-800 max-w-4xl mx-auto mb-12 md:mb-20">
+                            <p className="text-lg md:text-lg text-gray-800 max-w-4xl mx-auto mb-12 md:mb-20">
                                 <span className="font-extrabold text-black">FURRMAA</span> enables growth without forcing businesses into heavy marketing or discounting. Our partner benefits include:
                             </p>
                         </div>
@@ -463,7 +463,7 @@ const OurMssionAndPartner = () => {
                                     className={`px-6 h-full flex items-center justify-center border-gray-300 
                                         ${index !== businessBenefits.length - 1 ? 'lg:border-r' : ''}`}
                                 >
-                                    <p className="text-black leading-tight">
+                                    <p className="text-black ">
                                         {benefit}
                                     </p>
                                 </div>

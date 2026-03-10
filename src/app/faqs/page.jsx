@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import Container from '@/components/Container';
-import { MdArrowDropDown } from 'react-icons/md';
+import { IoChevronDown } from 'react-icons/io5';
 import WhyChooseFurrmaa from '@/components/WhyChooseFurrmaa';
 import { fetchFaqs } from '@/lib/api';
 
@@ -30,7 +30,7 @@ const FaqPage = () => {
           
           {/* Centered Top Heading */}
           <div className="mb-16">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-black tracking-tight">
+            <h1 className="text-4xl font-extrabold text-black tracking-tight">
               Frequently Asked Questions
             </h1>
           </div>
@@ -57,7 +57,7 @@ const FaqPage = () => {
                       activeIndex === index ? "rotate-180 bg-gray-200 text-black" : ""
                     }`}
                   >
-                    <MdArrowDropDown className="text-2xl" />
+                    <IoChevronDown className="text-xl" />
                   </span>
                 </button>
 

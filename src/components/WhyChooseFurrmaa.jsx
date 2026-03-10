@@ -3,7 +3,7 @@ import { questions } from "@/data/faqs";
 import { useState } from "react";
 import React from "react";
 import { FaApple, FaGooglePlay } from "react-icons/fa";
-import { MdArrowDropDown } from "react-icons/md";
+import { IoChevronDown } from 'react-icons/io5';
 
 const features = [
   {
@@ -140,7 +140,7 @@ function FaqSection() {
 
         {/* Left */}
         <div>
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900">
+          <h2 className="text-4xl leading-13 md:text-4xl font-bold text-gray-900">
             Frequently Asked
             <br />
             Questions
@@ -168,7 +168,7 @@ function FaqSection() {
                   className={`ml-4 w-9 h-9 flex items-center justify-center rounded-full bg-gray-200 text-black transition-transform duration-300 ${activeIndex === index ? "rotate-180" : ""
                     }`}
                 >
-                  <MdArrowDropDown />
+                  <IoChevronDown />
                 </span>
               </button>
 
