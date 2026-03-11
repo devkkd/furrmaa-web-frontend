@@ -16,7 +16,7 @@ export const dogBanners = [
     subHeading: "Happy Homes.",
     description:
       "Premium food and wellness products designed for your dog’s best life.",
-    image: "/images/Dog2.png",
+    image: "/images/Dog22.png",
     button: "EXPLORE →",
   },
   {
@@ -25,7 +25,7 @@ export const dogBanners = [
     subHeading: "Support That Matters.",
     description:
       "Training, grooming, and expert advice tailored for dogs.",
-    image: "/images/Dog3.png",
+    image: "/images/Dog3.jpg",
     button: "LEARN MORE →",
   },
 ];

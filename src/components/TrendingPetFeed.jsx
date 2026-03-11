@@ -25,7 +25,7 @@ export default function TrendingPetFeed() {
     <section className="w-full bg-white py-20">
       <div className="max-w-7xl mx-auto px-6">
         
-        <p className="text-sm font-semibold text-gray-600 mb-3">
+        <p className="text-sm font-semibold text-gray-900 mb-3">
           Trending Pet Feed
         </p>
 
@@ -34,7 +34,7 @@ export default function TrendingPetFeed() {
           <span>🐾</span>
         </h2>
 
-        <p className="text-gray-600 max-w-3xl mb-14">
+        <p className="text-gray-900 max-w-3xl mb-14">
           Explore the most loved pet videos and moments shared by the Furrmaa
           community. From playful pups to curious cats, discover what’s trending
           right now—and get inspired to share your own pet’s story.

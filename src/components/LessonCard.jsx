@@ -15,7 +15,7 @@ const LessonCard = ({ lesson, plan }) => {
   };
 
   return (
-    <div className="bg-white border border-[#8E939A] rounded-[24px] shadow-sm overflow-hidden">
+    <div className="bg-white border border-[#dadce1] hover:border-[#abeb87] rounded-[24px] shadow-sm overflow-hidden">
       <img src={lesson.image} className="w-full h-28 object-cover" />
 
       <div className="p-4 space-y-2">

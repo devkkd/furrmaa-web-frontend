@@ -36,7 +36,7 @@ export default function Feedback() {
         <section className="w-full bg-gray-50 py-20">
             <div className="max-w-7xl mx-auto px-6">
 
-                <p className="text-sm font-semibold text-gray-600 mb-3">
+                <p className="text-sm font-semibold text-gray-900 mb-3">
                     Happy Customer Feedback
                 </p>
 
@@ -44,7 +44,7 @@ export default function Feedback() {
                     Trusted by Pet Parents Who Truly Care
                 </h2>
 
-                <p className="text-gray-600 max-w-3xl mb-14">
+                <p className="text-gray-700 max-w-3xl mb-14">
                     Thousands of pet parents rely on Furrmaa every day to keep their pets
                     healthy, happy, and safe. Here’s what our community has to say.
                 </p>

@@ -24,13 +24,13 @@ const LogoutModal = ({ isOpen, onClose, onConfirm }) => {
                     Are you sure you want to <br /> log out of this device?
                 </p>
                 <div className="space-y-3">
-                    <button 
+                    <button
                         onClick={onConfirm}
                         className="w-full bg-[#1a2b48] text-white font-bold py-3.5 rounded-full hover:bg-[#111e33] transition-colors shadow-md"
                     >
                         Log Out
                     </button>
-                    <button 
+                    <button
                         onClick={onClose}
                         className="w-full text-gray-900 font-bold py-2 hover:text-gray-600 transition-colors"
                     >
@@ -60,13 +60,13 @@ const DeleteModal = ({ isOpen, onClose, onConfirm }) => {
                     This action cannot be undone. All your data and pet information will be permanently deleted. Do you want to continue?
                 </p>
                 <div className="space-y-3">
-                    <button 
+                    <button
                         onClick={onConfirm}
                         className="w-full bg-[#ff5a5a] text-white font-bold py-3.5 rounded-full hover:bg-red-600 transition-colors shadow-md shadow-red-100"
                     >
                         Delete Account
                     </button>
-                    <button 
+                    <button
                         onClick={onClose}
                         className="w-full text-gray-900 font-bold py-2 hover:text-gray-600 transition-colors"
                     >
@@ -181,8 +181,8 @@ const AccountSettings = () => {
                                 {/* Name Field */}
                                 <div className="space-y-2">
                                     <label className="text-sm font-bold text-gray-700 ml-1">Your Name</label>
-                                    <input 
-                                        type="text" 
+                                    <input
+                                        type="text"
                                         placeholder="Enter Your Name"
                                         value={name}
                                         onChange={(e) => setName(e.target.value)}
@@ -193,8 +193,8 @@ const AccountSettings = () => {
                                 {/* Email Field */}
                                 <div className="space-y-2">
                                     <label className="text-sm font-bold text-gray-700 ml-1">Email Address</label>
-                                    <input 
-                                        type="email" 
+                                    <input
+                                        type="email"
                                         placeholder="Enter Your Email Address"
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
@@ -202,20 +202,22 @@ const AccountSettings = () => {
                                     />
                                 </div>
 
-                                {/* Mobile Number with Change CTA (app jaisa) */}
+                                {/* Mobile Number with Change CTA  */}
                                 <div className="space-y-2">
                                     <label className="text-sm font-bold text-gray-700 ml-1">Mobile Number</label>
-                                    <div className="relative flex gap-2">
-                                        <input 
-                                            type="tel" 
+
+                                    <div className="relative">
+                                        <input
+                                            type="tel"
                                             placeholder="99999 99999"
                                             value={phone}
                                             onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
-                                            className="flex-1 px-5 py-3.5 border border-gray-200 rounded-xl bg-gray-50/50 focus:outline-none focus:ring-1 focus:ring-gray-300 text-[15px]"
+                                            className="w-full px-5 pr-36 py-3.5 border border-gray-200 rounded-xl bg-gray-50/50 focus:outline-none focus:ring-1 focus:ring-gray-300 text-[15px]"
                                         />
-                                        <button 
+
+                                        <button
                                             type="button"
-                                            className="shrink-0 bg-[#1a2b48] text-white text-[11px] font-bold px-4 py-3.5 rounded-xl hover:bg-[#111e33] transition"
+                                            className="absolute right-2 top-1/2 -translate-y-1/2 bg-black text-white text-[11px] font-semibold px-4 py-2 rounded-full"
                                         >
                                             Change Number
                                         </button>
@@ -242,7 +244,7 @@ const AccountSettings = () => {
                                     {saveMessage.text}
                                 </p>
                             )}
-                            <button 
+                            <button
                                 type="button"
                                 onClick={handleSaveChanges}
                                 disabled={saving}
@@ -256,7 +258,7 @@ const AccountSettings = () => {
                     {/* Bottom Action Footer */}
                     <div className="border-t border-gray-50 p-8 md:p-12 grid grid-cols-1 md:grid-cols-2 gap-6 bg-gray-50/30">
                         {/* Log Out Action */}
-                        <button 
+                        <button
                             onClick={() => setShowLogoutModal(true)}
                             className="flex items-center gap-4 p-6 bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-md transition-all group text-left"
                         >
@@ -270,7 +272,7 @@ const AccountSettings = () => {
                         </button>
 
                         {/* Delete Account Action */}
-                        <button 
+                        <button
                             onClick={() => setShowDeleteModal(true)}
                             className="flex items-center gap-4 p-6 bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-md transition-all group text-left"
                         >
@@ -287,15 +289,15 @@ const AccountSettings = () => {
             </Container>
 
             {/* Render Popups */}
-            <LogoutModal 
-                isOpen={showLogoutModal} 
-                onClose={() => setShowLogoutModal(false)} 
-                onConfirm={handleLogout} 
+            <LogoutModal
+                isOpen={showLogoutModal}
+                onClose={() => setShowLogoutModal(false)}
+                onConfirm={handleLogout}
             />
-            <DeleteModal 
-                isOpen={showDeleteModal} 
-                onClose={() => setShowDeleteModal(false)} 
-                onConfirm={handleDelete} 
+            <DeleteModal
+                isOpen={showDeleteModal}
+                onClose={() => setShowDeleteModal(false)}
+                onConfirm={handleDelete}
             />
         </section>
     );

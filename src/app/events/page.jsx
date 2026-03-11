@@ -44,15 +44,27 @@ const PetEvents = () => {
                     {/* Header Section */}
                     <div className="flex flex-col md:flex-row justify-between items-center mb-10 gap-4">
                         <h1 className="text-4xl font-bold text-gray-900">Pet Events</h1>
-                        <div className="relative flex items-center gap-2 border border-gray-200 rounded-full px-4 py-2 bg-white shadow-sm w-full md:w-auto">
-                            <HiOutlineLocationMarker className="text-gray-400 text-xl shrink-0" />
-                            <button
-                                type="button"
-                                onClick={() => setShowCityPicker(!showCityPicker)}
-                                className="text-sm text-gray-600 flex-grow px-2 text-left"
-                            >
-                                {city}
-                            </button>
+
+                        {/* Location Picker */}
+                        <div className="relative w-full md:w-auto min-w-[280px]">
+                            {/* Visual Container */}
+                            <div className="flex items-center justify-between border border-gray-200 rounded-2xl pl-4 pr-2 py-2 bg-white w-full">
+                                <div className="flex items-center gap-3">
+                                    <HiOutlineLocationMarker className="text-[#1F2E46] text-[22px] shrink-0" />
+                                    <span className="text-lg text-[#1F2E46]">
+                                        {city}
+                                    </span>
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={() => setShowCityPicker(!showCityPicker)}
+                                    className="bg-[#95E562] text-gray-900 text-sm font-medium px-5 py-2 rounded-xl hover:bg-[#85cc57] transition-colors ml-4"
+                                >
+                                    Change
+                                </button>
+                            </div>
+
+                            {/* Dropdown */}
                             {showCityPicker && (
                                 <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-lg z-10 py-2">
                                     {CITIES.map((c) => (
@@ -60,7 +72,7 @@ const PetEvents = () => {
                                             key={c}
                                             type="button"
                                             onClick={() => { setCity(c); setShowCityPicker(false); }}
-                                            className={`block w-full text-left px-4 py-2 text-sm hover:bg-gray-50 ${city === c ? 'bg-[#a3e635]/20 text-gray-900 font-medium' : 'text-gray-600'}`}
+                                            className={`block w-full text-left px-4 py-2 text-sm hover:bg-gray-50 ${city === c ? 'bg-[#95E562]/20 text-gray-900 font-medium' : 'text-gray-600'}`}
                                         >
                                             {c}
                                         </button>

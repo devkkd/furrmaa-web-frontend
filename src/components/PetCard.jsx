@@ -7,36 +7,36 @@ export default function PetCard() {
       <div className="max-w-7xl mx-auto px-4">
         <div className="mb-6">
           <h2 className="text-3xl font-bold text-gray-900">Pet Training</h2>
-          <p className="text-gray-600 text-lg mt-1">
+          <p className="text-gray-900 text-lg mt-1">
             Start where your pet feels comfortable
           </p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Main Card (Orange) - Now a clickable Link */}
-          <Link 
-            href="/training" 
-            className="lg:col-span-2 bg-[#FFE1A8] rounded-3xl p-6 md:p-8 flex flex-col md:flex-row gap-8 relative overflow-hidden group cursor-pointer hover:shadow-lg transition-all duration-300"
+          <Link
+            href="/training"
+            className="lg:col-span-2 bg-gradient-to-b from-[#FFE5B4] to-[#FFCC80] rounded-3xl p-6 md:p-8 flex flex-col md:flex-row gap-8 relative overflow-hidden group cursor-pointer hover:shadow-lg transition-all duration-300"
           >
-            
+
             {/* Left Content Side */}
             <div className="flex-1 flex flex-col justify-between z-10">
               <div className="space-y-4">
-                <div className="flex items-center gap-3">
+                <div className="flex justify-between items-center gap-3">
                   <h3 className="text-2xl font-bold text-gray-900">Basic Training</h3>
                   <span className="text-xs bg-white px-3 py-1 rounded-full font-medium shadow-sm">
                     Free
                   </span>
                 </div>
 
-                <p className="text-base text-gray-800 leading-relaxed">
+                <p className="text-base text-gray-800 leading-relaxed w-50">
                   Foundation skills, simple commands, bonding.
                 </p>
 
-                <div className="flex flex-wrap gap-2 pt-2">
-                  <span className="border border-gray-800/20 rounded-full px-4 py-1.5 text-xs font-medium bg-white/20">7 Lessons</span>
-                  <span className="border border-gray-800/20 rounded-full px-4 py-1.5 text-xs font-medium bg-white/20">7 Days</span>
-                  <span className="border border-gray-800/20 rounded-full px-4 py-1.5 text-xs font-medium bg-white/20">
+                <div className="flex flex-wrap gap-2 pt-2 w-50">
+                  <span className="text-[12px] font-semibold px-3 py-1 rounded-full border text-black/80 border-black/80">7 Lessons</span>
+                  <span className="text-[12px] font-semibold px-3 py-1 rounded-full border text-black/80 border-black/80">7 Days</span>
+                  <span className="text-[12px] font-semibold px-3 py-1 rounded-full border text-black/80 border-black/80">
                     7 Great Ways to Training
                   </span>
                 </div>
@@ -52,7 +52,7 @@ export default function PetCard() {
                 <img
                   src="/images/CardTwo/p1.png"
                   alt="puppy"
-                  className="w-40 h-auto md:absolute md:bottom-0 md:left-[25%] lg:left-[28%]"
+                  className="w-40 h-auto md:absolute md:bottom-4 md:left-[25%] lg:left-[28%]"
                 />
               </div>
             </div>
@@ -85,12 +85,11 @@ export default function PetCard() {
           </Link>
 
           {/* Side Card (Blue) */}
-          <div className="bg-[#D9E9FF] rounded-3xl p-6 md:p-8 flex flex-col justify-between relative overflow-hidden min-h-[300px]">
-            <div>
+<div className="bg-gradient-to-b from-[#F3F8FF] to-[#C0DBFF] rounded-3xl p-6 md:p-8 flex flex-col justify-between relative overflow-hidden min-h-[300px]">            <div>
               <h3 className="text-2xl font-bold text-gray-900 leading-tight">
-                Hire a Personal <br className="hidden md:block"/> Pet Trainer
+                Hire a Personal Pet Trainer
               </h3>
-              <p className="text-sm text-gray-700 mt-4 leading-relaxed max-w-[70%] md:max-w-full">
+              <p className="text-sm text-gray-700 mt-4 leading-relaxed w-40 md:w-60">
                 Personalized, one-on-one training in your home. Positive
                 methods. Real results.
               </p>

@@ -1,6 +1,7 @@
 // components/ToggleDogCat.jsx
 'use client'
 
+import Image from 'next/image'
 import { usePetStore } from '@/store/petStore'
 
 export default function ToggleDogCat({ onShopPage, currentPetType, onPetTypeChange }) {
@@ -23,7 +24,14 @@ export default function ToggleDogCat({ onShopPage, currentPetType, onPetTypeChan
           ${active === 'dog' ? 'bg-[#1F2E46] text-white' : 'text-gray-400'}
         `}
       >
-        🐶 Dog Essentials
+        <Image 
+          src="/images/icons/dogicon.png" 
+          alt="Dog" 
+          width={20} 
+          height={20} 
+          className="object-contain"
+        />
+        Dog Essentials
       </button>
 
       <button
@@ -32,7 +40,14 @@ export default function ToggleDogCat({ onShopPage, currentPetType, onPetTypeChan
           ${active === 'cat' ? 'bg-[#95E562] text-gray-900' : 'text-gray-400'}
         `}
       >
-        🐱 Cat Essentials
+        <Image 
+          src="/images/icons/caticon.png" 
+          alt="Cat" 
+          width={20} 
+          height={20} 
+          className="object-contain"
+        />
+        Cat Essentials
       </button>
 
     </div>

@@ -25,7 +25,7 @@ export default function FurrmaaPetAI() {
                         Your Pet’s Smart Assistant Right in Your Pocket
                     </h3>
 
-                    <p className="text-gray-600 max-w-xl mb-8">
+                    <p className="text-gray-900 max-w-xl mb-8">
                         Get instant, reliable support for your pet anytime, anywhere.
                         <span className="font-semibold text-gray-900">
                             {" "}Furrmaa Pet AI Chat
@@ -37,7 +37,7 @@ export default function FurrmaaPetAI() {
                     <h4 className="text-xl font-semibold text-gray-900 mb-2">
                         Start Chatting with Your Pet’s AI Today
                     </h4>
-                    <p className="text-gray-600 mb-6">
+                    <p className="text-gray-900 mb-6">
                         Download the{" "}
                         <span className="font-semibold text-gray-900">
                             Furrmaa mobile app
