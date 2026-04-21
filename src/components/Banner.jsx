@@ -1,58 +1,125 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Pagination } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/pagination";
 
-import { fetchExploreContent } from "@/lib/api";
 import { usePetStore } from "@/store/petStore";
 
 export default function Banner() {
   const petType = usePetStore((state) => state.petType);
-  const [slides, setSlides] = useState([]);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    let cancelled = false;
-    setLoading(true);
-    fetchExploreContent({ featured: true, petType: petType || "dog" })
-      .then((content) => {
-        if (cancelled) return;
-        const mapped = (content || [])
-          .filter((item) => item.image)
-          .slice(0, 5)
-          .map((item) => ({
-            image: item.image,
-            title: item.category ? `Furrmaa ${item.category}` : "Furrmaa",
-            heading: item.title || "Pet Care",
-            subHeading: "",
-            description: item.description || "",
-            button: "EXPLORE →",
-          }));
-        setSlides(mapped);
-      })
-      .catch(() => {
-        if (!cancelled) setSlides([]);
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
-      });
-    return () => {
-      cancelled = true;
-    };
+  const banners = useMemo(() => {
+    const dogBanners = [
+      {
+        image: "/images/banner/Dog-Banner-01.png",
+        title: "Furrmaa Dogs",
+        heading: "Complete Care for Dogs",
+        subHeading: "Nutrition • Grooming • Wellness",
+        description: "All-in-one solutions to keep your dog healthy and active.",
+        button: "EXPLORE →",
+      },
+      {
+        image: "/images/banner/Dog-Banner-02.png",
+        title: "Furrmaa Dogs",
+        heading: "Premium Dog Food",
+        subHeading: "High Protein • Balanced Diet",
+        description: "Fuel your dog with high-quality and nutritious meals.",
+        button: "EXPLORE →",
+      },
+      
+   
+      {
+        image: "/images/banner/Dog-Banner-05.png",
+        title: "Furrmaa Dogs",
+        heading: "Dog Grooming Range",
+        subHeading: "Clean • Fresh • Safe",
+        description: "Keep your dog clean and fresh with safe grooming kits.",
+        button: "EXPLORE →",
+      },
+     
+      {
+        image: "/images/banner/Dog-Banner-07.png",
+        title: "Furrmaa Dogs",
+        heading: "Comfortable Dog Beds",
+        subHeading: "Soft • Cozy • Durable",
+        description: "Give your dog the comfort they truly deserve.",
+        button: "EXPLORE →",
+      },
+      {
+        image: "/images/banner/Dog-Banner-10.png",
+        title: "Furrmaa Dogs",
+        heading: "Dog Training Essentials",
+        subHeading: "Smart • Effective • Easy",
+        description: "Train your dog with the right tools and techniques.",
+        button: "EXPLORE →",
+      },
+      {
+        image: "/images/banner/Dog-Banner-11.png",
+        title: "Furrmaa Dogs",
+        heading: "Travel with Dogs",
+        subHeading: "Safe • Easy • Comfortable",
+        description: "Make traveling with your dog smooth and stress-free.",
+        button: "EXPLORE →",
+      },
+      {
+        image: "/images/banner/Dog-Banner-12.png",
+        title: "Furrmaa Dogs",
+        heading: "Dog Feeding Essentials",
+        subHeading: "Bowls • Feeders • Storage",
+        description: "Smart feeding solutions for your dog’s daily routine.",
+        button: "EXPLORE →",
+      },
+    
+    ];
+
+    const catBanners = [
+      {
+        image: "/images/banner/Cat-Banner-01.png",
+        title: "Furrmaa Cats",
+        heading: "Healthy Cat Lifestyle",
+        subHeading: "Care • Comfort • Nutrition",
+        description: "Ensure your cat lives a happy and healthy life.",
+        button: "EXPLORE →",
+      },
+      {
+        image: "/images/banner/Cat-Banner-02.png",
+        title: "Furrmaa Cats",
+        heading: "Premium Cat Food",
+        subHeading: "Tasty • Balanced • Safe",
+        description: "Delicious meals packed with essential nutrients.",
+        button: "EXPLORE →",
+      },
+      {
+        image: "/images/banner/Cat-Banner-03.png",
+        title: "Furrmaa Cats",
+        heading: "Cat Daily Essentials",
+        subHeading: "Litter • Toys • Care",
+        description: "All daily needs for your cat in one place.",
+        button: "EXPLORE →",
+      },
+      {
+        image: "/images/banner/Cat-Banner-04.png",
+        title: "Furrmaa Cats",
+        heading: "Cat Comfort Products",
+        subHeading: "Soft • Cozy • Relaxing",
+        description: "Give your cat the comfort they deserve.",
+        button: "EXPLORE →",
+      },
+      {
+        image: "/images/banner/Cat-Banner-05.png",
+        title: "Furrmaa Cats",
+        heading: "Fun Cat Toys",
+        subHeading: "Play • Engage • Enjoy",
+        description: "Keep your cat active and entertained all day.",
+        button: "EXPLORE →",
+      },
+    ];
+
+    return petType === "cat" ? catBanners : dogBanners;
   }, [petType]);
-
-  const banners = useMemo(() => slides, [slides]);
-
-  if (loading) {
-    return (
-      <div className="w-full flex justify-center px-4 pt-6">
-        <div className="w-full max-w-7xl min-h-[380px] md:min-h-[450px] rounded-2xl bg-gray-100 animate-pulse" />
-      </div>
-    );
-  }
 
   if (banners.length === 0) {
     return null;
@@ -79,7 +146,6 @@ export default function Banner() {
               "
               style={{ backgroundImage: `url(${item.image})` }}
             >
-              {/* Mobile blur overlay */}
               <div className="absolute inset-0 backdrop-blur-sm md:hidden" />
 
               <div className="relative z-10 w-full md:w-1/2 px-6 md:px-14 text-center md:text-left space-y-4">
