@@ -1,26 +1,43 @@
-import React from "react";
-import { FaPlay } from "react-icons/fa";
+"use client";
 
-const feedItems = [
-  {
-    id: 1,
-    image: "/images/Feed/feed1.png",
-  },
-  {
-    id: 2,
-    image: "/images/Feed/feed2.png",
-  },
-  {
-    id: 3,
-    image: "/images/Feed/feed3.png",
-  },
-  {
-    id: 4,
-    image: "/images/Feed/feed4.png",
-  },
-];
+import React, { useEffect, useState } from "react";
+import { FaPlay } from "react-icons/fa";
+import { fetchExploreContent } from "@/lib/api";
+import { usePetStore } from "@/store/petStore";
+
+function toFeedItem(item) {
+  return {
+    id: item._id,
+    image: item.image,
+    title: item.title || "Trending Pet Story",
+  };
+}
 
 export default function TrendingPetFeed() {
+  const petType = usePetStore((state) => state.petType);
+  const [feedItems, setFeedItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    fetchExploreContent({ type: "video", featured: true, petType: petType || "dog" })
+      .then((list) => {
+        if (cancelled) return;
+        const items = (list || []).filter((x) => x.image).slice(0, 8).map(toFeedItem);
+        setFeedItems(items);
+      })
+      .catch(() => {
+        if (!cancelled) setFeedItems([]);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [petType]);
+
   return (
     <section className="w-full bg-white py-20">
       <div className="max-w-7xl mx-auto px-6">
@@ -40,7 +57,12 @@ export default function TrendingPetFeed() {
           right now—and get inspired to share your own pet’s story.
         </p>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        {loading ? (
+          <p className="text-gray-500">Loading trending feed...</p>
+        ) : feedItems.length === 0 ? (
+          <p className="text-gray-500">No trending feed available right now.</p>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {feedItems.map((item) => (
             <div
               key={item.id}
@@ -65,7 +87,8 @@ export default function TrendingPetFeed() {
               </div>
             </div>
           ))}
-        </div>
+          </div>
+        )}
 
       </div>
     </section>

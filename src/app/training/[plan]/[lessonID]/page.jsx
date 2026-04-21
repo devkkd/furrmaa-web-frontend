@@ -12,12 +12,13 @@ import InstructorCard from '@/components/InstructorCard';
 
 function videoToLesson(video, index = 0) {
   const duration = video.duration || 5;
+  const durationText = typeof duration === 'number' ? `${duration} Min` : `${duration}`;
   return {
     id: video._id,
     _id: video._id,
     title: video.title || '(Video Title)',
     lessonNum: `${index + 1} Lesson`,
-    time: `${index + 1} Day | 4:56 Min`, // Hardcoded to match UI, ideally replace with dynamic video duration
+    time: `${index + 1} Day | ${durationText}`,
     duration,
     image: video.thumbnail || `/images/lessons/lesson${(index % 7) + 1}.png`,
     videoUrl: video.videoUrl,

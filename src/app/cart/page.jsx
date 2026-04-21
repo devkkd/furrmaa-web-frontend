@@ -5,27 +5,7 @@ import { useState, useEffect, useCallback, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useCartStore } from '@/store/cartStore';
 import Container from '@/components/Container';
-
-const getApiBase = () => typeof process !== 'undefined' && process.env.NEXT_PUBLIC_API_URL
-  ? process.env.NEXT_PUBLIC_API_URL
-  : 'http://localhost:5000/api';
-
-const getToken = () => {
-  if (typeof window === 'undefined') return null;
-  return localStorage.getItem('token');
-};
-
-async function fetchAddresses() {
-  const base = getApiBase();
-  const token = getToken();
-  if (!token) return [];
-  const res = await fetch(`${base}/addresses`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  if (!res.ok) return [];
-  const data = await res.json();
-  return data.addresses || [];
-}
+import { fetchAddresses } from '@/lib/api';
 
 // Placeholder image to avoid 404 (no local /images/products/p1.png)
 const PLACEHOLDER_IMG = 'https://placehold.co/80x80/e5e7eb/6b7280?text=Pet';

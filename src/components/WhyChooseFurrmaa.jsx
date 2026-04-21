@@ -1,39 +1,36 @@
 "use client"
-import { questions } from "@/data/faqs";
-import { useState } from "react";
+import { fetchExploreContent, fetchFaqs } from "@/lib/api";
+import { useEffect, useState } from "react";
 import React from "react";
 import { FaApple, FaGooglePlay } from "react-icons/fa";
 import { IoChevronDown } from 'react-icons/io5';
 
-const features = [
-  {
-    id: 1,
-    image: "/images/whyFurrmaa/why1.png",
-    title: "Designed Specifically For\nDogs & Cats",
-  },
-  {
-    id: 2,
-    image: "/images/whyFurrmaa/whe2.png",
-    title: "Trusted Service Partners",
-  },
-  {
-    id: 3,
-    image: "/images/whyFurrmaa/why3.png",
-    title: "AI-Driven Smart\nCare",
-  },
-  {
-    id: 4,
-    image: "/images/whyFurrmaa/why4.png",
-    title: "Secure, Scalable\nPlatform",
-  },
-  {
-    id: 5,
-    image: "/images/whyFurrmaa/why5.png",
-    title: "Community\nFirst Approach",
-  },
-];
-
 export default function WhyChooseFurrmaa() {
+  const [features, setFeatures] = useState([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetchExploreContent({ featured: true })
+      .then((list) => {
+        if (cancelled) return;
+        const featureList = (list || [])
+          .filter((item) => item?.title)
+          .slice(0, 5)
+          .map((item, index) => ({
+            id: item._id || index,
+            image: item.image || "/images/whyFurrmaa/why1.png",
+            title: item.title,
+          }));
+        setFeatures(featureList);
+      })
+      .catch(() => {
+        if (!cancelled) setFeatures([]);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   return (
     <>
       <section className="w-full bg-white py-20">
@@ -130,9 +127,29 @@ function DownloadApk() {
 
 
 function FaqSection() {
-  const faqs = questions;
-
   const [activeIndex, setActiveIndex] = useState(0);
+  const [faqs, setFaqs] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    fetchFaqs()
+      .then((list) => {
+        if (!cancelled) {
+          setFaqs((list || []).map((item) => ({ q: item.question, a: item.answer })));
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setFaqs([]);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   return (
     <section className="w-full bg-gray-50 py-24">
@@ -149,7 +166,11 @@ function FaqSection() {
 
         {/* Right */}
         <div className="space-y-6">
-          {faqs.map((item, index) => (
+          {loading ? (
+            <p className="text-gray-500">Loading FAQs...</p>
+          ) : faqs.length === 0 ? (
+            <p className="text-gray-500">No FAQs available right now.</p>
+          ) : faqs.map((item, index) => (
             <div
               key={index}
               className="border-b border-gray-200 pb-6"

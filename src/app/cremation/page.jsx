@@ -6,12 +6,14 @@ import { HiOutlineLocationMarker, HiOutlineSearch, HiPhone } from 'react-icons/h
 import { RiDirectionLine } from 'react-icons/ri';
 import { LuArrowUpDown } from 'react-icons/lu';
 import Link from 'next/link';
-import cremationCentersStatic from "@/data/cremationCenter";
 import { fetchCremationCenters } from '@/lib/api';
 import { useGeolocation } from '@/hooks/useGeolocation';
 
 const CremationServices = () => {
-    const [services, setServices] = useState(cremationCentersStatic);
+    const [services, setServices] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [search, setSearch] = useState('');
+    const [sortBy, setSortBy] = useState('name');
     const [showLocationModal, setShowLocationModal] = useState(false);
     const [manualLocation, setManualLocation] = useState('');
     const { location, loading: locLoading, error: locError, fetchCurrentLocation, setLocation } = useGeolocation('Pratap Nagar, Jaipur');
@@ -34,9 +36,14 @@ const CremationServices = () => {
     };
 
     useEffect(() => {
-        fetchCremationCenters()
+        setLoading(true);
+        const cityFromLocation = location?.split(',')?.[0]?.trim();
+        fetchCremationCenters({
+            city: cityFromLocation || undefined,
+            search: search.trim() || undefined,
+        })
             .then((centers) => {
-                setServices((centers || []).map((c) => ({
+                const mapped = (centers || []).map((c) => ({
                     _id: c._id,
                     name: c.name,
                     address: c.address,
@@ -45,10 +52,16 @@ const CremationServices = () => {
                     phone: c.phone,
                     image: c.image || '/images/Events/events.png',
                     distance: c.distance || `${c.city}, ${c.state}`,
-                })));
+                }));
+                const sorted = [...mapped].sort((a, b) => {
+                    if (sortBy === 'city') return String(a.city || '').localeCompare(String(b.city || ''));
+                    return String(a.name || '').localeCompare(String(b.name || ''));
+                });
+                setServices(sorted);
             })
-            .catch(() => setServices(cremationCentersStatic));
-    }, []);
+            .catch(() => setServices([]))
+            .finally(() => setLoading(false));
+    }, [location, search, sortBy]);
 
     return (
         <section className="bg-white py-6 px-4 md:px-0 md:py-10 min-h-screen">
@@ -67,6 +80,8 @@ const CremationServices = () => {
                             <input
                                 type="text"
                                 placeholder="Search Cremation"
+                                value={search}
+                                onChange={(e) => setSearch(e.target.value)}
                                 className="w-full pl-10 pr-4 py-2.5 border border-gray-100 rounded-xl bg-gray-50/50 focus:outline-none focus:ring-1 focus:ring-gray-200 text-sm transition-all"
                             />
                         </div>
@@ -74,10 +89,13 @@ const CremationServices = () => {
                         {/* Controls Row for Mobile */}
                         <div className="flex items-center gap-2 w-full sm:w-auto">
                             {/* Sort Toggle */}
-                            <button className="flex items-center justify-center gap-2 border border-gray-100 rounded-xl px-4 py-2.5 text-sm text-gray-600 bg-white hover:bg-gray-50 transition flex-1 sm:flex-none font-medium">
-                                <span>Sort By</span>
+                            <div className="flex items-center justify-center gap-2 border border-gray-100 rounded-xl px-4 py-2.5 text-sm text-gray-600 bg-white hover:bg-gray-50 transition flex-1 sm:flex-none font-medium">
                                 <LuArrowUpDown className="text-gray-400" />
-                            </button>
+                                <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="bg-transparent focus:outline-none">
+                                    <option value="name">Sort: Name</option>
+                                    <option value="city">Sort: City</option>
+                                </select>
+                            </div>
 
                             {/* Location Pill */}
                             <div className="flex items-center gap-2 border border-gray-100 rounded-xl px-3 py-1.5 bg-white shadow-sm flex-1 sm:flex-none justify-between sm:justify-start">
@@ -141,10 +159,15 @@ const CremationServices = () => {
                 </div>
 
                 {/* Services Grid: 1 column on mobile, 2 columns on tablets/desktops */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-                    {services.map((service, idx) => (
+                {loading ? (
+                    <div className="py-10 text-center text-gray-500">Loading cremation centers...</div>
+                ) : services.length === 0 ? (
+                    <div className="py-10 text-center text-gray-500">No cremation centers found for selected location.</div>
+                ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                    {services.map((service) => (
                         <div
-                            key={idx}
+                            key={service._id}
                             // Changed: 'flex-row' for all screens (image always left), adjusted gap and padding for mobile
                             className="flex flex-row gap-3 p-3 md:gap-5 md:p-5 bg-white border border-gray-100 rounded-[20px] md:rounded-[28px] transition-all hover:shadow-md group"
                         >
@@ -174,15 +197,20 @@ const CremationServices = () => {
 
                                 {/* Action Buttons */}
                                 <div className="flex flex-wrap items-center gap-2 md:gap-4 mt-auto">
-                                    <button className="flex items-center justify-center gap-1 md:gap-2 bg-[#8b5cf6] text-white px-3 py-1.5 md:px-5 md:py-2.5 rounded-full text-[10px] md:text-xs font-bold hover:bg-[#7c3aed] transition-colors shadow-sm">
+                                    <a href={service.phone ? `tel:${service.phone}` : undefined} className="flex items-center justify-center gap-1 md:gap-2 bg-[#8b5cf6] text-white px-3 py-1.5 md:px-5 md:py-2.5 rounded-full text-[10px] md:text-xs font-bold hover:bg-[#7c3aed] transition-colors shadow-sm">
                                         <HiPhone className="text-xs md:text-sm" />
                                         <span className="hidden sm:inline">Call</span>
-                                    </button>
+                                    </a>
 
-                                    <button className="flex items-center gap-1 md:gap-2 text-gray-600 text-[10px] md:text-xs font-bold hover:text-gray-900 transition-colors">
+                                    <a
+                                        href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${service.name}, ${service.address || ''}, ${service.city || ''}`)}`}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="flex items-center gap-1 md:gap-2 text-gray-600 text-[10px] md:text-xs font-bold hover:text-gray-900 transition-colors"
+                                    >
                                         <RiDirectionLine className="text-sm md:text-lg" />
                                         <span className="hidden sm:inline">Direction</span>
-                                    </button>
+                                    </a>
 
                                     <Link href={`/cremation/reqCremation/${service._id}`} className='ml-auto'>
                                         <button className="bg-[#1e293b] text-white px-3 py-1.5 md:px-5 md:py-2.5 rounded-full text-[9px] md:text-[10px] lg:text-xs font-bold hover:bg-black transition-colors shadow-sm whitespace-nowrap">
@@ -193,7 +221,8 @@ const CremationServices = () => {
                             </div>
                         </div>
                     ))}
-                </div>
+                    </div>
+                )}
             </Container>
         </section>
     );

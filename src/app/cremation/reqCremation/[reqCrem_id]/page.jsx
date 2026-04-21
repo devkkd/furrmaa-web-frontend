@@ -5,7 +5,7 @@ import Container from '@/components/Container'
 import { submitCremationRequest } from '@/lib/api'
 
 const RequestForCremation = () => {
-    const { id } = useParams() // cremation center ID
+    const { reqCrem_id } = useParams() // cremation center ID
     const router = useRouter()
 
     const [formData, setFormData] = useState({
@@ -38,14 +38,14 @@ const RequestForCremation = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault()
-        if (isFormIncomplete || !id) return
+        if (isFormIncomplete || !reqCrem_id) return
 
         setSubmitting(true)
         setError('')
 
         try {
             const payload = {
-                cremationCenterId: id,
+                cremationCenterId: reqCrem_id,
                 fullName: formData.fullName.trim(),
                 mobileNumber: formData.mobileNumber.trim(),
                 address: formData.address.trim(),

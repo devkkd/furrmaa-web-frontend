@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { adminGetTrainingVideos, adminDeleteTrainingVideo, adminCreateTrainingVideo } from '@/lib/api';
+import { adminGetTrainingVideos, adminDeleteTrainingVideo, adminCreateTrainingVideo, adminUpdateTrainingVideo } from '@/lib/api';
 
 const CATEGORY_OPTIONS = [
   { value: 'basic', label: 'Basic (Free)' },
@@ -14,6 +14,7 @@ export default function AdminTrainingVideosPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState(null);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({ title: '', description: '', videoUrl: '', category: 'basic' });
 
@@ -46,9 +47,45 @@ export default function AdminTrainingVideosPage() {
       });
       setForm({ title: '', description: '', videoUrl: '', category: 'basic' });
       setShowForm(false);
+      setEditingId(null);
       fetchVideos();
     } catch (e) {
       alert(e.message || 'Failed to add video');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const startEdit = (video) => {
+    setEditingId(video._id);
+    setForm({
+      title: video.title || '',
+      description: video.description || '',
+      videoUrl: video.videoUrl || '',
+      category: video.category || 'basic',
+    });
+    setShowForm(true);
+  };
+
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+    if (!editingId) return;
+    setSaving(true);
+    try {
+      await adminUpdateTrainingVideo(editingId, {
+        title: form.title.trim(),
+        description: form.description.trim(),
+        videoUrl: form.videoUrl.trim(),
+        category: form.category,
+        isFree: form.category === 'basic',
+        isPremium: form.category !== 'basic',
+      });
+      setForm({ title: '', description: '', videoUrl: '', category: 'basic' });
+      setShowForm(false);
+      setEditingId(null);
+      fetchVideos();
+    } catch (e) {
+      alert(e.message || 'Failed to update video');
     } finally {
       setSaving(false);
     }
@@ -80,8 +117,8 @@ export default function AdminTrainingVideosPage() {
 
       {showForm && (
         <div className="bg-white border border-gray-100 rounded-xl p-6 max-w-xl">
-          <h2 className="text-lg font-bold text-gray-900 mb-4">Add Training Video</h2>
-          <form onSubmit={handleAdd} className="space-y-4">
+          <h2 className="text-lg font-bold text-gray-900 mb-4">{editingId ? 'Edit Training Video' : 'Add Training Video'}</h2>
+          <form onSubmit={editingId ? handleUpdate : handleAdd} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Title *</label>
               <input type="text" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" placeholder="Video title" required />
@@ -102,7 +139,7 @@ export default function AdminTrainingVideosPage() {
                 ))}
               </select>
             </div>
-            <button type="submit" disabled={saving} className="bg-[#1F2E46] text-white font-medium px-5 py-2.5 rounded-lg disabled:opacity-70">{saving ? 'Saving…' : 'Add Video'}</button>
+            <button type="submit" disabled={saving} className="bg-[#1F2E46] text-white font-medium px-5 py-2.5 rounded-lg disabled:opacity-70">{saving ? 'Saving…' : editingId ? 'Update Video' : 'Add Video'}</button>
           </form>
         </div>
       )}
@@ -125,7 +162,10 @@ export default function AdminTrainingVideosPage() {
                   <td className="p-3 font-medium text-gray-900">{v.title || '–'}</td>
                   <td className="p-3 text-gray-600 max-w-xs truncate">{v.videoUrl || v.lessonId || '–'}</td>
                   <td className="p-3">
-                    <button type="button" onClick={() => handleDelete(v._id, v.title)} className="text-red-600 hover:underline">Delete</button>
+                    <div className="flex items-center gap-3">
+                      <button type="button" onClick={() => startEdit(v)} className="text-blue-600 hover:underline">Edit</button>
+                      <button type="button" onClick={() => handleDelete(v._id, v.title)} className="text-red-600 hover:underline">Delete</button>
+                    </div>
                   </td>
                 </tr>
               ))

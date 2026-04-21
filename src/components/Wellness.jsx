@@ -9,7 +9,6 @@ import { Navigation } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 
-import { catWellnessData, dogWellnessData } from "@/data/wellness";
 import { usePetStore } from "@/store/petStore";
 import { fetchAllCategories } from "@/lib/api";
 import { AdminImage } from "@/app/admin/components/AdminImage";
@@ -33,9 +32,9 @@ const isOther = (name, slug) => {
   return s === "other";
 };
 
-export default function Wellness({ pet }) {
+export default function Wellness() {
   const petType = usePetStore((state) => state.petType);
-  const [apiCategories, setApiCategories] = useState([]);
+  const [data, setData] = useState([]);
 
   useEffect(() => {
     let cancelled = false;
@@ -43,27 +42,16 @@ export default function Wellness({ pet }) {
       .then((list) => {
         if (!cancelled && Array.isArray(list)) {
           const active = list.filter((c) => c.isActive !== false);
-          setApiCategories(active.map(mapCategory));
+          setData(active.map(mapCategory).filter((c) => !isOther(c.title, c.slug)));
         }
       })
-      .catch(() => {});
+      .catch(() => {
+        if (!cancelled) setData([]);
+      });
     return () => {
       cancelled = true;
     };
   }, []);
-
-  // Static (jo pehle se photo ke sath the) + backend se jo aaye, "Other" mat dikhao
-  const staticList = petType === "cat" ? catWellnessData : dogWellnessData;
-  const staticWithSlug = staticList.map((item) => ({
-    ...item,
-    slug: item.slug || titleToCategory(item.title || item.name),
-    _id: item.id ?? item.title,
-  }));
-  const staticSlugs = new Set(staticWithSlug.map((i) => (i.slug || "").toLowerCase()));
-  const fromApi = apiCategories.filter(
-    (c) => !isOther(c.title, c.slug) && !staticSlugs.has((c.slug || "").toLowerCase())
-  );
-  const data = [...staticWithSlug, ...fromApi];
 
   return (
     <section className="w-full py-10">

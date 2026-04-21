@@ -7,13 +7,15 @@ export const useCartStore = create(
     (set, get) => ({
       items: [],
       addItem: (product) => {
+        const resolvedProductId = String(product?.id || product?._id || '').trim()
+        if (!resolvedProductId) return
         const items = get().items
-        const found = items.find(i => i.productId === product.id)
+        const found = items.find(i => String(i.productId) === resolvedProductId)
 
         if (found) {
           set({
             items: items.map(i =>
-              i.productId === product.id
+              String(i.productId) === resolvedProductId
                 ? { ...i, qty: i.qty + 1 }
                 : i
             ),
@@ -23,10 +25,10 @@ export const useCartStore = create(
           const oldPrice = product.discountPrice != null ? product.price : (product.oldPrice ?? product.price);
           set({
             items: [...items, {
-              productId: product.id,
+              productId: resolvedProductId,
               qty: 1,
               product: {
-                id: product.id,
+                id: resolvedProductId,
                 name: product.name,
                 image: product.image || product.images?.[0],
                 price,
@@ -37,13 +39,15 @@ export const useCartStore = create(
         }
       },
       removeItem: (productId) => {
-        set({ items: get().items.filter(i => i.productId !== productId) })
+        const targetId = String(productId)
+        set({ items: get().items.filter(i => String(i.productId) !== targetId) })
       },
       updateQty: (productId, qty) => {
         if (qty < 1) return
+        const targetId = String(productId)
         set({
           items: get().items.map(i =>
-            i.productId === productId ? { ...i, qty } : i
+            String(i.productId) === targetId ? { ...i, qty } : i
           ),
         })
       },

@@ -1,9 +1,10 @@
 "use client"
 import React, { useState, useEffect } from 'react';
+import { useRef } from 'react';
 import Container from '@/components/Container';
 import { HiOutlineLogout, HiOutlineTrash, HiOutlineUserCircle } from 'react-icons/hi';
 import { useAuthStore } from '@/store/authStore';
-import { getToken, setToken, fetchMe, updateProfile, deleteAccount } from '@/lib/api';
+import { setToken, updateProfile, deleteAccount, uploadImage } from '@/lib/api';
 import { useRouter } from 'next/navigation';
 
 /* --- Modal Components --- */
@@ -87,10 +88,12 @@ const AccountSettings = () => {
     const setUser = useAuthStore((s) => s.setUser);
     const [showLogoutModal, setShowLogoutModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const photoInputRef = useRef(null);
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [phone, setPhone] = useState('');
     const [saving, setSaving] = useState(false);
+    const [uploadingPhoto, setUploadingPhoto] = useState(false);
     const [saveMessage, setSaveMessage] = useState(null);
 
     useEffect(() => {
@@ -154,6 +157,25 @@ const AccountSettings = () => {
         }
     };
 
+    const handleUploadPhoto = async (e) => {
+        const file = e.target?.files?.[0];
+        if (!file) return;
+        setUploadingPhoto(true);
+        try {
+            const imageUrl = await uploadImage(file, 'furmaa/users');
+            const updated = await updateProfile({ profileImage: imageUrl });
+            if (updated) {
+                setUser(updated);
+                setSaveMessage({ type: 'success', text: 'Profile picture updated' });
+            }
+        } catch (err) {
+            setSaveMessage({ type: 'error', text: err.message || 'Failed to upload profile picture' });
+        } finally {
+            setUploadingPhoto(false);
+            if (photoInputRef.current) photoInputRef.current.value = '';
+        }
+    };
+
     return (
         <section className="bg-white h-full">
             <Container>
@@ -167,12 +189,17 @@ const AccountSettings = () => {
                             <div className="w-full lg:w-1/4 flex flex-col items-center border-r border-gray-100 pr-0 lg:pr-12">
                                 <div className="relative group cursor-pointer">
                                     <div className="w-32 h-32 rounded-full bg-gray-100 flex items-center justify-center border-2 border-dashed border-gray-300 overflow-hidden">
-                                        <HiOutlineUserCircle className="text-6xl text-gray-400" />
+                                        {user?.profileImage ? (
+                                            <img src={user.profileImage} alt={user?.name || 'Profile'} className="w-full h-full object-cover" />
+                                        ) : (
+                                            <HiOutlineUserCircle className="text-6xl text-gray-400" />
+                                        )}
                                     </div>
                                     <div className="absolute inset-0 flex items-center justify-center bg-black/0 group-hover:bg-black/5 rounded-full transition-all" />
                                 </div>
-                                <button className="mt-4 text-sm font-bold text-gray-700 hover:text-gray-900 transition-colors">
-                                    Upload Profile Picture
+                                <input ref={photoInputRef} type="file" accept="image/*" className="hidden" onChange={handleUploadPhoto} />
+                                <button onClick={() => photoInputRef.current?.click()} className="mt-4 text-sm font-bold text-gray-700 hover:text-gray-900 transition-colors">
+                                    {uploadingPhoto ? 'Uploading...' : 'Upload Profile Picture'}
                                 </button>
                             </div>
 
@@ -217,6 +244,7 @@ const AccountSettings = () => {
 
                                         <button
                                             type="button"
+                                            onClick={() => document.querySelector('input[type="tel"]')?.focus()}
                                             className="absolute right-2 top-1/2 -translate-y-1/2 bg-black text-white text-[11px] font-semibold px-4 py-2 rounded-full"
                                         >
                                             Change Number

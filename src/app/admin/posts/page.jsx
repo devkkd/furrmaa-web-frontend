@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { adminGetPosts, adminDeletePost, adminCreatePost } from '@/lib/api';
+import { adminGetPosts, adminDeletePost, adminCreatePost, adminUpdatePost } from '@/lib/api';
 import { AdminImage } from '../components/AdminImage';
 
 export default function AdminPostsPage() {
@@ -9,6 +9,7 @@ export default function AdminPostsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [editingId, setEditingId] = useState(null);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({ content: '', images: '', userId: '', petId: '' });
 
@@ -36,9 +37,40 @@ export default function AdminPostsPage() {
       await adminCreatePost(payload);
       setForm({ content: '', images: '', userId: '', petId: '' });
       setShowAddForm(false);
+      setEditingId(null);
       fetchPosts();
     } catch (e) {
       alert(e.message || 'Failed to create post');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const startEdit = (post) => {
+    setEditingId(post._id);
+    setForm({
+      content: post.content || '',
+      images: (post.images || []).join(', '),
+      userId: post.user?._id || '',
+      petId: post.pet?._id || '',
+    });
+    setShowAddForm(true);
+  };
+
+  const handleUpdatePost = async (e) => {
+    e.preventDefault();
+    if (!editingId || !form.content?.trim()) return;
+    setSaving(true);
+    try {
+      const payload = { content: form.content.trim() };
+      payload.images = form.images?.trim() ? form.images.split(',').map((u) => u.trim()).filter(Boolean) : [];
+      await adminUpdatePost(editingId, payload);
+      setForm({ content: '', images: '', userId: '', petId: '' });
+      setEditingId(null);
+      setShowAddForm(false);
+      fetchPosts();
+    } catch (e) {
+      alert(e.message || 'Failed to update post');
     } finally {
       setSaving(false);
     }
@@ -68,8 +100,8 @@ export default function AdminPostsPage() {
 
       {showAddForm && (
         <div className="bg-white border border-gray-100 rounded-xl p-6 max-w-xl">
-          <h2 className="text-lg font-bold text-gray-900 mb-4">Add Post</h2>
-          <form onSubmit={handleAddPost} className="space-y-4">
+          <h2 className="text-lg font-bold text-gray-900 mb-4">{editingId ? 'Edit Post' : 'Add Post'}</h2>
+          <form onSubmit={editingId ? handleUpdatePost : handleAddPost} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Content *</label>
               <textarea value={form.content} onChange={(e) => setForm({ ...form, content: e.target.value })} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm min-h-[100px]" placeholder="Post content" required />
@@ -86,7 +118,7 @@ export default function AdminPostsPage() {
               <label className="block text-sm font-medium text-gray-700 mb-1">Pet ID (optional)</label>
               <input type="text" value={form.petId} onChange={(e) => setForm({ ...form, petId: e.target.value })} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" placeholder="Pet ID" />
             </div>
-            <button type="submit" disabled={saving} className="bg-[#1F2E46] text-white font-medium px-5 py-2.5 rounded-lg disabled:opacity-70">{saving ? 'Saving…' : 'Create Post'}</button>
+            <button type="submit" disabled={saving} className="bg-[#1F2E46] text-white font-medium px-5 py-2.5 rounded-lg disabled:opacity-70">{saving ? 'Saving…' : editingId ? 'Update Post' : 'Create Post'}</button>
           </form>
         </div>
       )}
@@ -126,9 +158,14 @@ export default function AdminPostsPage() {
               )}
               <div className="px-4 py-2 flex items-center justify-between border-t border-gray-100">
                 <span className="text-sm text-gray-500">❤️ {p.likes?.length ?? 0} &nbsp; 💬 {p.comments?.length ?? 0}</span>
-                <button type="button" onClick={() => handleDelete(p._id)} className="text-sm text-red-600 hover:underline font-medium">
-                  Delete
-                </button>
+                <div className="flex items-center gap-3">
+                  <button type="button" onClick={() => startEdit(p)} className="text-sm text-blue-600 hover:underline font-medium">
+                    Edit
+                  </button>
+                  <button type="button" onClick={() => handleDelete(p._id)} className="text-sm text-red-600 hover:underline font-medium">
+                    Delete
+                  </button>
+                </div>
               </div>
             </div>
           ))

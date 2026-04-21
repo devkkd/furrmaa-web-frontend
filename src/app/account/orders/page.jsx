@@ -1,13 +1,23 @@
 'use client';
 
-import { statusMap } from '@/data/dummyOrders'
 import Link from 'next/link'
 import React, { useState, useEffect } from 'react'
 import { HiOutlineSearch, HiOutlineAdjustments } from 'react-icons/hi'
 import { fetchOrders } from '@/lib/api'
 
+const statusMap = {
+  pending: 'Pending',
+  processing: 'Processing',
+  shipped: 'Shipped',
+  delivered: 'Delivered',
+  cancelled: 'Cancelled',
+  returned: 'Returned',
+};
+
 const MyOrders = () => {
   const [orders, setOrders] = useState([])
+  const [search, setSearch] = useState('')
+  const [statusFilter, setStatusFilter] = useState('all')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
@@ -42,12 +52,22 @@ const MyOrders = () => {
     return () => { cancelled = true }
   }, [])
 
+  const filteredOrders = orders.filter((order) => {
+    const product = order?.items?.[0]?.product;
+    const orderId = String(order?._id || '').toLowerCase();
+    const productName = String(product?.name || '').toLowerCase();
+    const q = search.trim().toLowerCase();
+    const matchesSearch = !q || orderId.includes(q) || productName.includes(q);
+    const matchesStatus = statusFilter === 'all' || String(order?.orderStatus || '').toLowerCase() === statusFilter;
+    return matchesSearch && matchesStatus;
+  });
+
   // Pagination logic
   const indexOfLastOrder = currentPage * ordersPerPage
   const indexOfFirstOrder = indexOfLastOrder - ordersPerPage
-  const currentOrders = orders.slice(indexOfFirstOrder, indexOfLastOrder)
+  const currentOrders = filteredOrders.slice(indexOfFirstOrder, indexOfLastOrder)
 
-  const totalPages = Math.ceil(orders.length / ordersPerPage)
+  const totalPages = Math.ceil(filteredOrders.length / ordersPerPage)
 
   return (
     <div className="bg-white border border-gray-100 md:rounded-[32px] md:p-8 pb-6 shadow-sm">
@@ -63,13 +83,34 @@ const MyOrders = () => {
           <input
             type="text"
             placeholder="Search your order here"
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setCurrentPage(1);
+            }}
             className="w-full pl-12 pr-4 py-3 bg-gray-50/50 border border-gray-100 rounded-xl focus:outline-none focus:ring-1 focus:ring-gray-200 text-sm"
           />
         </div>
 
-        <button className="flex items-center gap-2 px-6 py-3 border border-gray-100 rounded-xl text-sm font-bold text-gray-700 hover:bg-gray-50">
-          Filters <HiOutlineAdjustments />
-        </button>
+        <div className="flex items-center gap-2 px-4 py-2 border border-gray-100 rounded-xl text-sm font-bold text-gray-700">
+          <HiOutlineAdjustments />
+          <select
+            value={statusFilter}
+            onChange={(e) => {
+              setStatusFilter(e.target.value);
+              setCurrentPage(1);
+            }}
+            className="bg-transparent focus:outline-none"
+          >
+            <option value="all">All</option>
+            <option value="pending">Pending</option>
+            <option value="processing">Processing</option>
+            <option value="shipped">Shipped</option>
+            <option value="delivered">Delivered</option>
+            <option value="cancelled">Cancelled</option>
+            <option value="returned">Returned</option>
+          </select>
+        </div>
       </div>
 
       {/* Orders List */}
@@ -81,7 +122,7 @@ const MyOrders = () => {
           <p className="text-red-600 mb-2">{error}</p>
         </div>
 
-      ) : orders.length === 0 ? (
+      ) : filteredOrders.length === 0 ? (
         <div className="py-12 text-center text-gray-500 font-medium">
           <p>No order history.</p>
         </div>

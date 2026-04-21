@@ -5,22 +5,9 @@ import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCartStore } from '@/store/cartStore';
 import Container from '@/components/Container';
-
-const getApiBase = () => (typeof process !== 'undefined' && process.env.NEXT_PUBLIC_API_URL)
-  ? process.env.NEXT_PUBLIC_API_URL
-  : 'http://localhost:5000/api';
+import { fetchAddresses, placeOrder } from '@/lib/api';
 
 const getToken = () => (typeof window !== 'undefined' ? localStorage.getItem('token') : null);
-
-async function fetchAddresses() {
-  const base = getApiBase();
-  const token = getToken();
-  if (!token) return [];
-  const res = await fetch(`${base}/addresses`, { headers: { Authorization: `Bearer ${token}` } });
-  if (!res.ok) return [];
-  const data = await res.json();
-  return data.addresses || [];
-}
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -79,7 +66,6 @@ export default function CheckoutPage() {
     setError(null);
     setPlacing(true);
     try {
-      const base = getApiBase();
       const orderBody = {
         items: items.map((i) => ({
           product: i.productId,
@@ -99,19 +85,7 @@ export default function CheckoutPage() {
         discount,
         deliveryFee,
       };
-      const res = await fetch(`${base}/orders`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(orderBody),
-      });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        setError(data.message || 'Failed to place order.');
-        return;
-      }
+      await placeOrder(orderBody);
       useCartStore.getState().clearCart();
       router.push('/cart?placed=1');
     } catch (err) {

@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { HiOutlineLocationMarker, HiChevronDown, HiChevronUp } from 'react-icons/hi';
 import Container from '@/components/Container';
 import WhyChooseFurrmaa from '@/components/WhyChooseFurrmaa';
-import { fetchPetEvents } from '@/lib/api';
+import { fetchPetEvents, registerPetEvent } from '@/lib/api';
 
 const PetEvents = () => {
     const [expandedEventId, setExpandedEventId] = useState(null);
@@ -11,6 +11,10 @@ const PetEvents = () => {
     const [loading, setLoading] = useState(true);
     const [city, setCity] = useState('Jaipur');
     const [showCityPicker, setShowCityPicker] = useState(false);
+    const [formByEvent, setFormByEvent] = useState({});
+    const [submittingId, setSubmittingId] = useState(null);
+    const [successId, setSuccessId] = useState(null);
+    const [errorByEvent, setErrorByEvent] = useState({});
 
     useEffect(() => {
         let cancelled = false;
@@ -36,6 +40,39 @@ const PetEvents = () => {
     const image1 = (event) => event.posterUrl || event.images?.[0];
     const image2 = (event) => event.images?.[1];
     const CITIES = ['Jaipur', 'Delhi', 'Mumbai', 'Bangalore', 'All'];
+
+    const getForm = (eventId) => formByEvent[eventId] || { name: '', email: '', phone: '', notes: '' };
+    const setFormField = (eventId, key, value) => {
+        setFormByEvent((prev) => ({
+            ...prev,
+            [eventId]: { ...getForm(eventId), [key]: value },
+        }));
+        setErrorByEvent((prev) => ({ ...prev, [eventId]: '' }));
+    };
+
+    const handleRegister = async (eventId) => {
+        const form = getForm(eventId);
+        if (!form.name.trim() || !form.phone.trim()) {
+            setErrorByEvent((prev) => ({ ...prev, [eventId]: 'Name and phone are required.' }));
+            return;
+        }
+        setSubmittingId(eventId);
+        setErrorByEvent((prev) => ({ ...prev, [eventId]: '' }));
+        try {
+            await registerPetEvent(eventId, {
+                name: form.name,
+                email: form.email,
+                phone: form.phone,
+                notes: form.notes,
+            });
+            setSuccessId(eventId);
+            setFormByEvent((prev) => ({ ...prev, [eventId]: { name: '', email: '', phone: '', notes: '' } }));
+        } catch (err) {
+            setErrorByEvent((prev) => ({ ...prev, [eventId]: err.message || 'Registration failed.' }));
+        } finally {
+            setSubmittingId(null);
+        }
+    };
 
     return (
         <section className="bg-white py-10">
@@ -176,6 +213,55 @@ const PetEvents = () => {
                                                         </p>
                                                     </div>
                                                 )}
+                                                <div className="space-y-3 pt-2 border-t border-gray-100 lg:border-none">
+                                                    <h3 className="font-bold text-gray-900 text-lg">Register for this event</h3>
+                                                    {successId === event._id ? (
+                                                        <p className="text-sm text-green-700 font-medium">Registration successful. See you there!</p>
+                                                    ) : (
+                                                        <>
+                                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                                                <input
+                                                                    type="text"
+                                                                    placeholder="Your name *"
+                                                                    value={getForm(event._id).name}
+                                                                    onChange={(e) => setFormField(event._id, 'name', e.target.value)}
+                                                                    className="px-3 py-2 border border-gray-200 rounded-lg text-sm"
+                                                                />
+                                                                <input
+                                                                    type="tel"
+                                                                    placeholder="Phone *"
+                                                                    value={getForm(event._id).phone}
+                                                                    onChange={(e) => setFormField(event._id, 'phone', e.target.value)}
+                                                                    className="px-3 py-2 border border-gray-200 rounded-lg text-sm"
+                                                                />
+                                                                <input
+                                                                    type="email"
+                                                                    placeholder="Email"
+                                                                    value={getForm(event._id).email}
+                                                                    onChange={(e) => setFormField(event._id, 'email', e.target.value)}
+                                                                    className="px-3 py-2 border border-gray-200 rounded-lg text-sm md:col-span-2"
+                                                                />
+                                                                <textarea
+                                                                    placeholder="Notes (optional)"
+                                                                    value={getForm(event._id).notes}
+                                                                    onChange={(e) => setFormField(event._id, 'notes', e.target.value)}
+                                                                    className="px-3 py-2 border border-gray-200 rounded-lg text-sm md:col-span-2 min-h-[70px]"
+                                                                />
+                                                            </div>
+                                                            {errorByEvent[event._id] && (
+                                                                <p className="text-sm text-red-600">{errorByEvent[event._id]}</p>
+                                                            )}
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => handleRegister(event._id)}
+                                                                disabled={submittingId === event._id}
+                                                                className="bg-[#1F2E46] text-white px-5 py-2.5 rounded-lg text-sm font-semibold disabled:opacity-60"
+                                                            >
+                                                                {submittingId === event._id ? 'Registering...' : 'Register Now'}
+                                                            </button>
+                                                        </>
+                                                    )}
+                                                </div>
                                             </div>
                                         </div>
                                     </div>

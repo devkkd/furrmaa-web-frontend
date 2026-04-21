@@ -4,37 +4,9 @@ import Link from 'next/link';
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Container from '@/components/Container';
-
-const getApiBase = () => (typeof process !== 'undefined' && process.env.NEXT_PUBLIC_API_URL)
-  ? process.env.NEXT_PUBLIC_API_URL
-  : 'http://localhost:5000/api';
+import { fetchAddresses, createAddress } from '@/lib/api';
 
 const getToken = () => (typeof window !== 'undefined' ? localStorage.getItem('token') : null);
-
-async function fetchAddresses() {
-  const base = getApiBase();
-  const token = getToken();
-  if (!token) return [];
-  const res = await fetch(`${base}/addresses`, { headers: { Authorization: `Bearer ${token}` } });
-  if (!res.ok) return [];
-  const data = await res.json();
-  return data.addresses || [];
-}
-
-async function createAddress(token, body) {
-  const base = getApiBase();
-  const res = await fetch(`${base}/addresses`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify(body),
-  });
-  const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(data.message || 'Failed to add address');
-  return data.address;
-}
 
 const initialForm = {
   name: '',
@@ -93,7 +65,7 @@ export default function AddressesPage() {
     setError(null);
     setSaving(true);
     try {
-      await createAddress(token, {
+      await createAddress({
         name: form.name.trim(),
         phone: form.phone.trim(),
         street: form.street.trim(),

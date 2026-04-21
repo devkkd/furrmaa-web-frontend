@@ -6,7 +6,6 @@ import { useParams, useRouter } from 'next/navigation';
 import Container from '@/components/Container';
 import ProductInfoCard from '@/components/ProductInfoCard';
 import { fetchOrderById, submitReturnRequest } from '@/lib/api';
-import { dummyOrders } from '@/data/dummyOrders';
 
 const ReturnOrderPage = () => {
     const { return_order_id } = useParams();
@@ -26,9 +25,7 @@ const ReturnOrderPage = () => {
             })
             .catch(() => {
                 if (!cancelled) {
-                    // Fallback to dummy data
-                    const dummyOrder = dummyOrders.find(o => o._id === return_order_id);
-                    setOrder(dummyOrder || null);
+                    setOrder(null);
                 }
             })
             .finally(() => {

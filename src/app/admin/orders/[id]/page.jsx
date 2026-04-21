@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { adminGetOrderById, adminUpdateOrderStatus } from '@/lib/api';
 import { AdminImage } from '../../components/AdminImage';

@@ -5,22 +5,17 @@ import { IoChevronDown } from 'react-icons/io5';
 import WhyChooseFurrmaa from '@/components/WhyChooseFurrmaa';
 import { fetchFaqs } from '@/lib/api';
 
-const staticFaqs = [
-  { q: "What is Furrmaa?", a: "Furrmaa is a mobile app that connects pet owners with a variety of pet-related services - from vet clinics to adoption, events, chat support, pet cremation requests, and more." },
-  { q: "Do I need an account to use Furrmaa?", a: "Yes, to manage pet profiles, request services, and use personalized features, you need to create an account." },
-  { q: "What kind of services can I find on Furrmaa?", a: "You can access veterinary clinics, adoption and lost & found services, pet events, cremation requests, pet-profile management, and a premium Pet AI Chatbot." },
-  { q: "How does location-based search work?", a: "With your permission, Furrmaa uses your current location to show nearby veterinary clinics and services – helping you find help quickly when needed." },
-  { q: "Is my personal and pet information safe?", a: "Yes. We follow industry-standard security practices, do not sell your data, and only share it with trusted partners when necessary to deliver services you request." },
-];
-
 const FaqPage = () => {
   const [activeIndex, setActiveIndex] = useState(0);
-  const [faqs, setFaqs] = useState(staticFaqs);
+  const [faqs, setFaqs] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    setLoading(true);
     fetchFaqs()
       .then((list) => setFaqs((list || []).map((f) => ({ q: f.question, a: f.answer }))))
-      .catch(() => setFaqs(staticFaqs));
+      .catch(() => setFaqs([]))
+      .finally(() => setLoading(false));
   }, []);
 
   return (
@@ -36,8 +31,13 @@ const FaqPage = () => {
           </div>
 
           {/* Full Width Question List */}
-          <div className="space-y-4">
-            {faqs.map((item, index) => (
+          {loading ? (
+            <div className="py-12 text-center text-gray-500">Loading FAQs...</div>
+          ) : faqs.length === 0 ? (
+            <div className="py-12 text-center text-gray-500">No FAQs found.</div>
+          ) : (
+            <div className="space-y-4">
+              {faqs.map((item, index) => (
               <div
                 key={index}
                 className="border-b border-gray-100 pb-6 pt-2"
@@ -72,8 +72,9 @@ const FaqPage = () => {
                   </p>
                 </div>
               </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </Container>
       <WhyChooseFurrmaa/>

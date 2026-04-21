@@ -4,7 +4,6 @@ import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { fetchProductById, normalizeProduct } from '@/lib/api';
-import { products as staticProducts } from '@/data/products';
 import { useCartStore } from '@/store/cartStore';
 
 // IMPORT THE NEW COMPONENT
@@ -28,25 +27,7 @@ export default function ProductDetailPage() {
     if (!productId) return;
     fetchProductById(productId)
       .then((p) => setProduct(normalizeProduct(p)))
-      .catch(() => {
-        const fallback = staticProducts.find((p) => p._id === productId || String(p._id) === productId);
-        if (fallback) {
-          setProduct({
-            id: fallback._id,
-            _id: fallback._id,
-            name: fallback.name,
-            image: (fallback.images && fallback.images[0]) || '/images/products/p1.png',
-            rating: fallback.rating || 0,
-            reviews: fallback.reviews || [],
-            price: fallback.discountPrice ?? fallback.price,
-            oldPrice: fallback.discountPrice ? fallback.price : undefined,
-            description: fallback.description,
-            category: fallback.category,
-            petType: fallback.petType,
-            brand: fallback.brand,
-          });
-        }
-      })
+      .catch(() => setProduct(null))
       .finally(() => setLoading(false));
   }, [productId]);
 

@@ -1,10 +1,9 @@
 /**
  * Web API client – backend integration
  */
-export const getBaseUrl = () =>
-  (typeof window !== 'undefined'
-    ? process.env.NEXT_PUBLIC_API_URL
-    : process.env.NEXT_PUBLIC_API_URL) || 'http://localhost:5000/api';
+import { API_BASE_URL } from '@/lib/apiBase';
+
+export const getBaseUrl = () => API_BASE_URL;
 
 export function getToken() {
   if (typeof window === 'undefined') return null;
@@ -72,6 +71,24 @@ export async function updateProfile(body) {
   if (res.status === 401) return null;
   if (!res.ok) throw new Error(data.message || 'Failed to update profile');
   return data.user;
+}
+
+/** Upload profile/general image (protected) */
+export async function uploadImage(file, folder = 'furmaa/users') {
+  const base = getBaseUrl();
+  const token = getToken();
+  if (!token) throw new Error('Please login first');
+  const formData = new FormData();
+  formData.append('image', file);
+  formData.append('folder', folder);
+  const res = await fetch(`${base}/upload/image`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` },
+    body: formData,
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.message || 'Upload failed');
+  return data.image?.url || data.url;
 }
 
 function authHeaders() {
@@ -326,11 +343,28 @@ export async function registerPetEvent(eventId, { name, email, phone, notes }) {
 /** Fetch FAQs from backend */
 export async function fetchFaqs(params = {}) {
   const base = getBaseUrl();
-  const url = `${base}/faqs`;
+  const q = new URLSearchParams();
+  if (params.category) q.set('category', params.category);
+  const url = `${base}/faq${q.toString() ? `?${q}` : ''}`;
   const res = await fetch(url);
   if (!res.ok) throw new Error('FAQs fetch failed');
   const data = await res.json();
   return data.faqs || [];
+}
+
+/** Fetch public explore content (articles/videos/guides/news/events). */
+export async function fetchExploreContent(params = {}) {
+  const base = getBaseUrl();
+  const q = new URLSearchParams();
+  if (params.category) q.set('category', params.category);
+  if (params.type) q.set('type', params.type);
+  if (params.petType) q.set('petType', params.petType);
+  if (params.featured != null) q.set('featured', params.featured ? 'true' : 'false');
+  const url = `${base}/explore${q.toString() ? `?${q}` : ''}`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error('Explore content fetch failed');
+  const data = await res.json();
+  return data.content || [];
 }
 
 /** Fetch single Hope post by ID */
@@ -435,6 +469,20 @@ export async function fetchAddresses() {
   if (!res.ok) throw new Error('Failed to fetch addresses');
   const data = await res.json();
   return data.addresses || [];
+}
+
+/** Place order (protected) */
+export async function placeOrder(orderBody) {
+  const base = getBaseUrl();
+  const res = await fetch(`${base}/orders`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...authHeaders() },
+    body: JSON.stringify(orderBody),
+  });
+  if (res.status === 401) throw new Error('Please log in to place order.');
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.message || 'Failed to place order.');
+  return data;
 }
 
 /** Create new address (protected) */
@@ -773,10 +821,34 @@ export async function adminGetSupport() {
   return d.chats || [];
 }
 
+export async function adminGetSupportById(id) {
+  const d = await adminFetch(`/admin/support/${id}`);
+  return d.chat;
+}
+
+export async function adminSendSupportMessage(id, body) {
+  const d = await adminFetch(`/admin/support/${id}/message`, { method: 'POST', body: JSON.stringify(body) });
+  return d.chat;
+}
+
+export async function adminUpdateSupportStatus(id, status) {
+  const d = await adminFetch(`/admin/support/${id}/status`, { method: 'PUT', body: JSON.stringify({ status }) });
+  return d.chat;
+}
+
 export async function adminGetUsers(params = {}) {
   const q = new URLSearchParams(params).toString();
   const d = await adminFetch(`/admin/users${q ? `?${q}` : ''}`);
   return d.users || [];
+}
+
+export async function adminUpdateUser(id, body) {
+  const d = await adminFetch(`/admin/users/${id}`, { method: 'PUT', body: JSON.stringify(body) });
+  return d.user;
+}
+
+export async function adminDeactivateUser(id) {
+  return adminFetch(`/admin/users/${id}`, { method: 'DELETE' });
 }
 
 export async function adminGetTrainingVideos() {

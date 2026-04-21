@@ -1,17 +1,62 @@
 "use client";
 
+import { useEffect, useMemo, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Pagination } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/pagination";
 
-import { dogBanners, catBanners } from "@/data/banner";
+import { fetchExploreContent } from "@/lib/api";
 import { usePetStore } from "@/store/petStore";
 
 export default function Banner() {
   const petType = usePetStore((state) => state.petType);
+  const [slides, setSlides] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const banners = petType === "cat" ? catBanners : dogBanners;
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    fetchExploreContent({ featured: true, petType: petType || "dog" })
+      .then((content) => {
+        if (cancelled) return;
+        const mapped = (content || [])
+          .filter((item) => item.image)
+          .slice(0, 5)
+          .map((item) => ({
+            image: item.image,
+            title: item.category ? `Furrmaa ${item.category}` : "Furrmaa",
+            heading: item.title || "Pet Care",
+            subHeading: "",
+            description: item.description || "",
+            button: "EXPLORE →",
+          }));
+        setSlides(mapped);
+      })
+      .catch(() => {
+        if (!cancelled) setSlides([]);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [petType]);
+
+  const banners = useMemo(() => slides, [slides]);
+
+  if (loading) {
+    return (
+      <div className="w-full flex justify-center px-4 pt-6">
+        <div className="w-full max-w-7xl min-h-[380px] md:min-h-[450px] rounded-2xl bg-gray-100 animate-pulse" />
+      </div>
+    );
+  }
+
+  if (banners.length === 0) {
+    return null;
+  }
 
   return (
     <div className="w-full flex justify-center px-4 pt-6">

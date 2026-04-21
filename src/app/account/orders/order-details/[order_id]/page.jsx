@@ -8,7 +8,6 @@ import { FaStar } from 'react-icons/fa';
 import { IoCheckmarkCircle } from 'react-icons/io5';
 import Link from 'next/link';
 import { fetchOrderById } from '@/lib/api';
-import { dummyOrders } from '@/data/dummyOrders';
 import ProductInfoCard from '@/components/ProductInfoCard';
 
 const OrderDetails = () => {
@@ -28,9 +27,7 @@ const OrderDetails = () => {
       })
       .catch(() => {
         if (!cancelled) {
-          // Fallback to dummy data
-          const dummyOrder = dummyOrders.find(o => o._id === order_id);
-          setOrder(dummyOrder || null);
+          setOrder(null);
         }
       })
       .finally(() => {

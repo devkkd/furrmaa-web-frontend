@@ -1,37 +1,44 @@
-import React from "react";
+"use client";
 
-const feedbacks = [
-    {
-        id: 1,
-        title: "The AI chatbot is surprisingly accurate",
-        text: "I wasn’t sure about using an AI assistant for my pet, but Furrmaa’s chatbot gave clear guidance and helped me decide when to consult a vet.",
-        name: "Ankit Verma",
-        role: "Cat Parent",
-    },
-    {
-        id: 2,
-        title: "Adoption and rescue made simple",
-        text: "The adoption and lost-pet listings are a blessing. We’ve been able to connect pets with families much faster through Furrmaa.",
-        name: "Neha Joshi",
-        role: "Pet Volunteer",
-    },
-    {
-        id: 3,
-        title: "Clean design and smooth experience",
-        text: "The app is intuitive and well designed. Even as a first-time pet parent, I never felt confused using it.",
-        name: "Rahul Mehta",
-        role: "First-time Pet Owner",
-    },
-    {
-        id: 4,
-        title: "Everything I need in one app",
-        text: "From ordering food to booking a vet appointment, Furrmaa has made pet care so much easier. The reminders and training videos are extremely helpful!",
-        name: "Ritika Sharma",
-        role: "Dog Parent",
-    },
-];
+import React, { useEffect, useState } from "react";
+import { fetchExploreContent } from "@/lib/api";
+import { usePetStore } from "@/store/petStore";
+
+function toFeedback(item) {
+    return {
+        id: item._id,
+        title: item.title || "Great Furrmaa experience",
+        text: item.description || "",
+        name: item.author || "Furrmaa Community",
+        role: item.category ? `${item.category} update` : "Pet Parent",
+    };
+}
 
 export default function Feedback() {
+    const petType = usePetStore((state) => state.petType);
+    const [feedbacks, setFeedbacks] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        let cancelled = false;
+        setLoading(true);
+        fetchExploreContent({ featured: true, petType: petType || "dog" })
+            .then((list) => {
+                if (cancelled) return;
+                const items = (list || []).slice(0, 4).map(toFeedback);
+                setFeedbacks(items);
+            })
+            .catch(() => {
+                if (!cancelled) setFeedbacks([]);
+            })
+            .finally(() => {
+                if (!cancelled) setLoading(false);
+            });
+        return () => {
+            cancelled = true;
+        };
+    }, [petType]);
+
     return (
         <section className="w-full bg-gray-50 py-20">
             <div className="max-w-7xl mx-auto px-6">
@@ -50,8 +57,13 @@ export default function Feedback() {
                 </p>
 
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                    {feedbacks.map((item) => (
+                {loading ? (
+                    <p className="text-gray-500">Loading feedback...</p>
+                ) : feedbacks.length === 0 ? (
+                    <p className="text-gray-500">No community feedback available right now.</p>
+                ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                        {feedbacks.map((item) => (
                         <div
                             key={item.id}
                             className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition"
@@ -75,8 +87,9 @@ export default function Feedback() {
                                 </span>
                             </div>
                         </div>
-                    ))}
-                </div>
+                        ))}
+                    </div>
+                )}
 
             </div>
         </section>

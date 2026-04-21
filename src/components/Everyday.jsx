@@ -10,7 +10,6 @@ import "swiper/css";
 import "swiper/css/navigation";
 
 import { usePetStore } from "@/store/petStore";
-import { dogEverydayData, catEverydayData } from "@/data/everyday";
 import { fetchAllCategories } from "@/lib/api";
 import { AdminImage } from "@/app/admin/components/AdminImage";
 
@@ -35,7 +34,7 @@ const isOther = (name, slug) => {
 
 export default function Everyday() {
   const petType = usePetStore((state) => state.petType);
-  const [apiCategories, setApiCategories] = useState([]);
+  const [data, setData] = useState([]);
 
   useEffect(() => {
     let cancelled = false;
@@ -43,27 +42,16 @@ export default function Everyday() {
       .then((list) => {
         if (!cancelled && Array.isArray(list)) {
           const active = list.filter((c) => c.isActive !== false);
-          setApiCategories(active.map(mapCategory));
+          setData(active.map(mapCategory).filter((c) => !isOther(c.title, c.slug)));
         }
       })
-      .catch(() => {});
+      .catch(() => {
+        if (!cancelled) setData([]);
+      });
     return () => {
       cancelled = true;
     };
   }, []);
-
-  // Static + Backend merge logic
-  const staticList = petType === "cat" ? catEverydayData : dogEverydayData;
-  const staticWithSlug = staticList.map((item) => ({
-    ...item,
-    slug: item.slug || titleToCategory(item.title || item.name),
-    _id: item.id ?? item.title,
-  }));
-  const staticSlugs = new Set(staticWithSlug.map((i) => (i.slug || "").toLowerCase()));
-  const fromApi = apiCategories.filter(
-    (c) => !isOther(c.title, c.slug) && !staticSlugs.has((c.slug || "").toLowerCase())
-  );
-  const data = [...staticWithSlug, ...fromApi];
 
   return (
     <section className="w-full py-10">
